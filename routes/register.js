@@ -15,7 +15,7 @@ router.post('/', function(req, res) {
     if(lack_fields.length == 0) {
         res.status(200).send(requestObject);
     } else {
-        res.status(403).send(lack_fields.join(', '));
+        res.status(403).send('缺少' + lack_fields.join(', ') + '欄位');
     }
 });
 
