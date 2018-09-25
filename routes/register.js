@@ -98,7 +98,7 @@ router.patch('/:sid', function(req, res) {
     let sid = req.params.sid;
     let requestObject = req.body;
     ref = req.database.ref('/user');
-    let verify_fields = ["photo", "first_name", "last_name", "email", "cellphone"];
+    let verify_fields = ["photo", "name", "email", "cellphone"];
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
         if(userObject.hasOwnProperty(sid)) {
