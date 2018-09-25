@@ -34,20 +34,30 @@ router.post('/:sid', function(req, res) {
             if(userObject.hasOwnProperty(sid)) {
                 ref = req.database.ref('/user/' + sid + '/card');
                 ref.once('value').then(function(card_snapshot) {
-                    let userCard = card_snapshot.val();
-                    console.log(userCard);
-                    for(let key in userCard) {
-                        if(userCard[key].cardID == requestObject.cardID) {
-                            res.status(406).send('卡號重複');
-                            return;
+                    if(card_snapshot.exist()) {
+                        let userCard = card_snapshot.val();
+                        console.log(userCard);
+                        for(let key in userCard) {
+                            if(userCard[key].cardID == requestObject.cardID) {
+                                res.status(406).send('卡號重複');
+                                return;
+                            }
                         }
+                        userCard.push({
+                            "cardID": requestObject.cardID,
+                            "cardName": requestObject.cardName
+                        });
+                        ref.set(userCard);
+                        res.status(200).send('成功');
+                    } else {
+                        let userCard = [];
+                        userCard.push({
+                            "cardID": requestObject.cardID,
+                            "cardName": requestObject.cardName
+                        });
+                        ref.set(userCard);
+                        res.status(200).send('成功');
                     }
-                    userCard.push({
-                        "cardID": requestObject.cardID,
-                        "cardName": requestObject.cardName
-                    });
-                    ref.set(userCard);
-                    res.status(200).send('成功');
                 });
             } else {
                 res.status(406).send('找不到該學號');
