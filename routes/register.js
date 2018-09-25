@@ -36,7 +36,6 @@ router.post('/:sid', function(req, res) {
                 ref.once('value').then(function(card_snapshot) {
                     if(card_snapshot.exists()) {
                         let userCard = card_snapshot.val();
-                        console.log(userCard);
                         for(let key in userCard) {
                             if(userCard[key].cardID == requestObject.cardID) {
                                 res.status(406).send('卡號重複');
@@ -145,7 +144,6 @@ router.delete('/:sid/card/:cardID', function(req, res) {
             ref = req.database.ref('/user/' + sid + '/card');
             ref.once('value').then(function(card_snapshot) {
                 if(card_snapshot.exists()) {
-                    console.log(card_snapshot);
                     let userCard = card_snapshot.val();
                     let index = -1;
                     for(let item in userCard) {
