@@ -96,12 +96,13 @@ router.post('/', function(req, res) {
 /* 修改帳號資料 */
 router.patch('/:sid', function(req, res) {
     let sid = req.params.sid;
+    let requestObject = req.body;
     ref = req.database.ref('/user');
     let verify_fields = ["photo", "first_name", "last_name", "email", "cellphone"];
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject.hasOwnProperty(requestObject.student_id)) {
-            ref = req.database.ref('/user/' + requestObject.student_id);
+        if(userObject.hasOwnProperty(sid)) {
+            ref = req.database.ref('/user/' + sid);
             ref.once('value').then(function(student_snapshot) {
                 let studentObject = student_snapshot.val();
                 if(studentObject.password == hash.sha256().update(requestObject.password).digest('hex')) {
@@ -109,22 +110,13 @@ router.patch('/:sid', function(req, res) {
                         if(requestObject.hasOwnProperty(verify_fields[key])) {
                             studentObject[verify_fields[key]] = requestObject[verify_fields[key]];
                         }
-                        ref.set(studentObject);
                     }
+                    ref.set(studentObject);
+                    res.status(200).send(requestObject);
                 } else {
                     res.status(401).send('密碼驗證錯誤');
                 }
             });
-            ref.push({
-                "name": requestObject.first_name + requestObject.last_name,
-                "email": requestObject.email,
-                "idenity": "學生",
-                "lineUserID": "null",
-                "password": hash.sha256().update(requestObject.password).digest('hex'),
-                "card": [],
-                "state": "未驗證"
-            });
-            res.status(200).send(requestObject);
         } else {
             res.status(406).send('該學號未註冊');
         }
