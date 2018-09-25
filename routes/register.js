@@ -147,11 +147,14 @@ router.delete('/:sid/card/:cardID', function(req, res) {
                 if(card_snapshot.exists()) {
                     console.log(card_snapshot);
                     let userCard = card_snapshot.val();
-                    if(userCard.indexOf(cardID) != -1) {
-                        let index = userObject.indexOf(cardID);
-                        if (index > -1) {
-                            userCard.splice(index, 1);
+                    let index = -1;
+                    for(let item in userCard) {
+                        if(userCard[item].cardID == cardID) {
+                            index = item;
                         }
+                    }
+                    if (index > -1) {
+                        userCard.splice(index, 1);
                         ref.set(userCard);
                         res.status(200).send('成功');
                     } else {
