@@ -34,7 +34,7 @@ router.post('/:sid', function(req, res) {
             if(userObject.hasOwnProperty(sid)) {
                 ref = req.database.ref('/user/' + sid + '/card');
                 ref.once('value').then(function(card_snapshot) {
-                    if(card_snapshot.exist()) {
+                    if(card_snapshot.exists()) {
                         let userCard = card_snapshot.val();
                         console.log(userCard);
                         for(let key in userCard) {
@@ -142,7 +142,7 @@ router.delete('/:sid/card/:cardID', function(req, res) {
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
         if(userObject.hasOwnProperty(sid)) {
-            ref = req.database.ref('/user/' + requestObject.student_id + '/card');
+            ref = req.database.ref('/user/' + sid + '/card');
             ref.once('value').then(function(card_snapshot) {
                 let userCard = card_snapshot.val();
                 if(userCard.indexOf(cardID) != -1) {
