@@ -32,9 +32,10 @@ router.post('/:sid', function(req, res) {
         ref.once('value').then(function(snapshot) {
             let userObject = snapshot.val();
             if(userObject.hasOwnProperty(sid)) {
-                ref = req.database.ref('/user/' + requestObject.student_id + '/card');
+                ref = req.database.ref('/user/' + sid + '/card');
                 ref.once('value').then(function(card_snapshot) {
                     let userCard = card_snapshot.val();
+                    console.log(userCard);
                     for(let key in userCard) {
                         if(userCard[key].cardID == requestObject.cardID) {
                             res.status(406).send('卡號重複');
@@ -80,7 +81,7 @@ router.post('/', function(req, res) {
                     "idenity": "學生",
                     "lineUserID": "null",
                     "password": hash.sha256().update(requestObject.password).digest('hex'),
-                    "card": [],
+                    "card": [null],
                     "state": "未驗證"
                 });
                 res.status(200).send(requestObject);
