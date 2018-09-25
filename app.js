@@ -6,6 +6,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
 var https = require('https');
+var admin = require("firebase-admin");
+var helmet = require('helmet');
 var fs = require('fs');
 
 var routes = require('./routes/index');
@@ -14,10 +16,24 @@ var register = require('./routes/register');
 
 var app = express();
 
+const config = require('./ENV.json');
 // Certificate
 const privateKey = fs.readFileSync('/etc/letsencrypt/live/xn--pss23c41retm.tw/privkey.pem', 'utf8');
 const certificate = fs.readFileSync('/etc/letsencrypt/live/xn--pss23c41retm.tw/cert.pem', 'utf8');
 const ca = fs.readFileSync('/etc/letsencrypt/live/xn--pss23c41retm.tw/chain.pem', 'utf8');
+// firebase key
+const key = require('./servicePrivateKey.json')
+
+// 初始化 firebase 服務
+admin.initializeApp({
+    credential: admin.credential.cert(key),
+    databaseURL: 'https://ncnusmartschool.firebaseio.com',
+    databaseAuthVariableOverride: {
+        uid: config.firebase_uid
+    }
+});
+
+const database = admin.database();
 
 const credentials = {
     key: privateKey,
@@ -35,6 +51,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(helmet());
+
+app.use(function(req, res, next) {
+    req.database = database;
+    next();
+});
+
 
 app.use('/', routes);
 app.use('/users', users);
