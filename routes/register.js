@@ -35,12 +35,12 @@ router.post('/:sid', function(req, res) {
                 ref = req.database.ref('/user/' + requestObject.student_id + '/card');
                 ref.once('value').then(function(card_snapshot) {
                     let userCard = card_snapshot.val();
-                    userCard.forEach(element => {
-                        if(element.cardID == requestObject.cardID) {
+                    for(let key in userCard) {
+                        if(userCard[key].cardID == requestObject.cardID) {
                             res.status(406).send('卡號重複');
                             return;
                         }
-                    });
+                    }
                     userCard.push({
                         "cardID": requestObject.cardID,
                         "cardName": requestObject.cardName
