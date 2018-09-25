@@ -74,7 +74,7 @@ router.post('/', function(req, res) {
             let userObject = snapshot.val();
             if(!userObject.hasOwnProperty(requestObject.student_id)) {
                 ref = req.database.ref('/user/' + requestObject.student_id);
-                ref.push({
+                ref.set({
                     "name": requestObject.first_name + requestObject.last_name,
                     "email": requestObject.email,
                     "idenity": "學生",
