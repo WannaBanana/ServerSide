@@ -144,18 +144,22 @@ router.delete('/:sid/card/:cardID', function(req, res) {
         if(userObject.hasOwnProperty(sid)) {
             ref = req.database.ref('/user/' + sid + '/card');
             ref.once('value').then(function(card_snapshot) {
-                let userCard = card_snapshot.val();
-                if(userCard.indexOf(cardID) != -1) {
-                    let index = userObject.indexOf(cardID);
-                    if (index > -1) {
-                        userCard.splice(index, 1);
+                if(card_snapshot.exists()) {
+                    console.log(card_snapshot);
+                    let userCard = card_snapshot.val();
+                    if(userCard.indexOf(cardID) != -1) {
+                        let index = userObject.indexOf(cardID);
+                        if (index > -1) {
+                            userCard.splice(index, 1);
+                        }
+                        ref.set(userCard);
+                        res.status(200).send('成功');
+                    } else {
+                        res.status(406).send('找不到該卡號');
                     }
                 } else {
                     res.status(406).send('找不到該卡號');
-                    return;
                 }
-                ref.set(userCard);
-                res.status(200).send('成功');
             });
         } else {
             res.status(406).send('找不到該學號');
