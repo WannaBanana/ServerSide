@@ -121,6 +121,9 @@ router.patch('/:sid', function(req, res) {
                         if(requestObject.hasOwnProperty(verify_fields[key])) {
                             studentObject[verify_fields[key]] = requestObject[verify_fields[key]];
                         }
+                        if(requestObject.hasOwnProperty('newpassword')) {
+                            studentObject['password'] = hash.sha256().update(requestObject.newpassword).digest('hex');
+                        }
                     }
                     ref.set(studentObject);
                     res.status(200).send(requestObject);
