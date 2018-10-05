@@ -11,7 +11,7 @@ var helmet = require('helmet');
 var fs = require('fs');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var user = require('./routes/user');
 var register = require('./routes/register');
 var room = require('./routes/room');
 
@@ -61,7 +61,7 @@ app.use(function(req, res, next) {
 
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/user', user);
 app.use('/register', register);
 app.use('/room', room);
 
