@@ -300,6 +300,9 @@ router.patch('/:department/:space/:key', function(req, res) {
                     }
                 }
             }
+            res.status(404).send({
+                "message": "找不到該筆預約資料"
+            });
         });
     } else {
         res.status(403).send({
@@ -312,7 +315,7 @@ router.patch('/:department/:space/:key', function(req, res) {
 router.delete('/:department/:space/:key', function(req, res) {
     let key = req.params.key;
     let department = req.params.department;
-    let space = req.params.department;
+    let space = req.params.space;
     let requestObject = req.body;
     let verify_fields = ["deleteRepeat"];
     let lack_fields = [];
@@ -322,30 +325,40 @@ router.delete('/:department/:space/:key', function(req, res) {
         }
     }
     if(lack_fields.length == 0) {
-        let parentID = undefined;
+        let childID = undefined;
+        let find = false;
         ref = req.database.ref('/reservation/' + department + '/' + space + '/');
         ref.once('value').then(function(snapshot) {
             let spaceReservation = snapshot.val();
             for(let date in spaceReservation) {
                 for(let self_key in spaceReservation[date]) {
                     if(self_key == key) {
+                        find = true;
                         ref.child(date).child(self_key).remove();
-                        parentID = self_key;
+                        if(spaceReservation[date][self_key].hasOwnProperty(child)) {
+                            childID = spaceReservation[date][self_key]['child'];
+                        }
                     }
                 }
             }
-            if(parentID == undefined) {
+            if(find == false) {
                 res.status(404).send({
                     "message": "找不到該筆預約資料"
                 });
                 return;
             }
-            if(requestObject.deleteRepeat == true) {
-                for(let date in spaceReservation) {
-                    for(let self_key in spaceReservation[date]) {
-                        if(spaceReservation[date][self_key].parent == parentID) {
-                            ref.child(date).child(self_key).remove();
-                            parentID = self_key;
+            if(requestObject.deleteRepeat == 'true' && childID != undefined) {
+                while(childID != undefined) {
+                    for(let date in spaceReservation) {
+                        for(let self_key in spaceReservation[date]) {
+                            if(self_key == childID) {
+                                ref.child(date).child(self_key).remove();
+                                if(spaceReservation[date][self_key].hasOwnProperty(child)) {
+                                    childID = spaceReservation[date][self_key]['child'];
+                                } else {
+                                    childID = undefined;
+                                }
+                            }
                         }
                     }
                 }
