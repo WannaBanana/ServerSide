@@ -133,6 +133,8 @@ router.post('/:department/:space', function(req, res) {
             // 插入預約
             console.log('插入預約');
             let parentKey = undefined;
+            let succes = 0;
+            let fail = 0;
             [begin, stop] = [new Date(requestObject.start), new Date(requestObject.end)];
             console.log('Start: ' + begin + ', end: ' + stop + ', reservationCurrent: ' + reservationCurrent);
             while(true) {
@@ -146,7 +148,15 @@ router.post('/:department/:space', function(req, res) {
                     for(key in reservationCurrent[date]) {
                         if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) < stop) {
                             conflict = true;
+                            fail++;
                             console.log('衝突');
+                            // 只有一筆的情況衝突
+                            if(requestObject.repeat == false) {
+                                res.status(403).send({
+                                    "message": "時間衝突"
+                                });
+                                return;
+                            }
                         }
                     }
                 }
@@ -173,6 +183,7 @@ router.post('/:department/:space', function(req, res) {
                     }
                     console.log(object);
                     parentKey = ref.push(object).key;
+                    succes++;
                     console.log(parentKey);
                 }
                 // 非重複性預約則結束迴圈
@@ -210,7 +221,7 @@ router.post('/:department/:space', function(req, res) {
                 }
             }
             res.status(200).send({
-                "message": "預約成功"
+                "message": '預約成功 - 筆數: ' + succes + ', 預約失敗 - 筆數: ' + fail
             });
         });
     } else {
