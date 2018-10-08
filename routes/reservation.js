@@ -209,6 +209,9 @@ router.post('/:department/:space', function(req, res) {
                     break;
                 }
             }
+            res.status(200).send({
+                "message": "預約成功"
+            });
         });
     } else {
         res.status(403).send({
