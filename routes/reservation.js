@@ -64,12 +64,11 @@ router.post('/:department/:space', function(req, res) {
             // 如果有資料的情況
             if(snapshot.hasChildren()) {
                 reservationCurrent = snapshot.val();
-                console.log('有資料: ' + reservationCurrent);
+                console.log('有資料: ' + JSON.stringify(reservationCurrent));
             }
-            console.log('沒資料')
             // 防止時間顛倒
             console.log('處理時間顛倒');
-            if(new Date(requestObject.start) > new Date(requestObject.end) ) {
+            if(new Date(requestObject.start).getTime() > new Date(requestObject.end).getTime() ) {
                 [requestObject.start, requestObject.end] = [requestObject.end, requestObject.start];
             }
             console.log('檢查衝突')
@@ -79,6 +78,7 @@ router.post('/:department/:space', function(req, res) {
             console.log('Start: ' + begin + ', end: ' + stop);
             // 不允許衝突情況下需檢查衝突
             if(requestObject.conflict == false) {
+                console.log('不允許衝突');
                 while(reservationCurrent != undefined) {
                     let date = new Date(begin).toISOString().slice(0, 10);
                     console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
