@@ -258,16 +258,22 @@ router.patch('/:department/:space/:key', function(req, res) {
             lack_fields.push(verify_fields[key]);
         }
     }
+    console.log('key: ' + key);
+    console.log(requestObject);
     if(lack_fields.length == 0) {
-        ref = req.database.ref('/reservation/' + department + '/' + space + '/');
+        ref = req.database.ref('/reservation/' + department + '/' + space);
         ref.once('value').then(function(snapshot) {
             let spaceReservation = snapshot.val();
             for(let date in spaceReservation) {
+                console.log('檢查 ' + date);
                 for(let self_key in spaceReservation[date]) {
                     if(self_key == key) {
+                        console.log('找到');
                         // 檢查是否衝突
+                        let begin = new Date(requestObject.start);
+                        let stop = new Date(requestObject.end);
                         for(let item in spaceReservation[date]) {
-                            if(new Date(reservationCurrent[date][item].start) <= new Date(requestObject.start) && new Date(reservationCurrent[date][item].start) > new Date(requestObject.end)) {
+                            if((new Date(reservationCurrent[date][item].start) <= begin && new Date(reservationCurrent[date][item].end) > begin) || (new Date(reservationCurrent[date][item].start) < stop && new Date(reservationCurrent[date][item].end) >= stop)) {
                                 res.status(403).send({
                                     "message": "時間衝突"
                                 });
