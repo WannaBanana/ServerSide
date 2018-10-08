@@ -151,7 +151,7 @@ router.post('/:department/:space', function(req, res) {
                             fail++;
                             console.log('衝突');
                             // 只有一筆的情況衝突
-                            if(requestObject.repeat == false) {
+                            if(requestObject.repeat == 'none') {
                                 res.status(403).send({
                                     "message": "時間衝突"
                                 });
