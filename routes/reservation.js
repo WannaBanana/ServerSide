@@ -182,7 +182,7 @@ router.post('/:department/:space', function(req, res) {
                     console.log(object);
                     ref.push(object).then((push_snapshot) => {
                         if(parentKey != undefined) {
-                            ref.child(parentKey).child('child').setValue(push_snapshot.key);
+                            ref.child(parentKey).update({"child": push_snapshot.key});
                         }
                         parentKey = push_snapshot.key;
                     })
