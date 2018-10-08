@@ -249,7 +249,7 @@ router.post('/:department/:space', function(req, res) {
 router.patch('/:department/:space/:key', function(req, res) {
     let key = req.params.key;
     let department = req.params.department;
-    let space = req.params.department;
+    let space = req.params.space;
     let requestObject = req.body;
     let verify_fields = ["describe", "type", "start", "end"];
     let lack_fields = [];
