@@ -195,7 +195,7 @@ router.post('/:department/:space', function(req, res) {
                                 }
                             });
                         }
-                        arr.push(push_snapshot.key);
+                        parent_arr.push(push_snapshot.key);
                     });
                     succes++;
                 }
