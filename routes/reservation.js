@@ -78,7 +78,7 @@ router.post('/:department/:space', function(req, res) {
             let stop = new Date(requestObject.end);
             console.log('Start: ' + begin + ', end: ' + stop);
             // 不允許衝突情況下需檢查衝突
-            if(requestObject.conflict == false) {
+            if(requestObject.conflict == 'false') {
                 console.log('不允許衝突');
                 while(reservationCurrent != undefined) {
                     let date = new Date(begin).toISOString().slice(0, 10);
