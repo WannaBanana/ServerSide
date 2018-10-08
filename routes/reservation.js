@@ -134,8 +134,8 @@ router.post('/:department/:space', function(req, res) {
             console.log('插入預約');
             let parentKey = undefined;
             [begin, stop] = [new Date(requestObject.start), new Date(requestObject.end)];
-            console.log('Start: ' + begin + ', end: ' + stop);
-            while(reservationCurrent != undefined) {
+            console.log('Start: ' + begin + ', end: ' + stop + ', reservationCurrent: ' + reservationCurrent);
+            while(true) {
                 // (年 / 月 / 日)來作為該天預約索引值
                 let date = new Date(begin).toISOString().slice(0, 10);
                 console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
