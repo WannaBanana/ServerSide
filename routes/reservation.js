@@ -82,7 +82,7 @@ router.post('/:department/:space', function(req, res) {
                 while(reservationCurrent != undefined) {
                     let date = new Date(begin).toISOString().slice(0, 10);
                     console.log('日期檢查: ' + date);
-                    if(reservationCurrent[date] != undefined) {
+                    if(reservationCurrent && reservationCurrent[date] != undefined) {
                         for(key in reservationCurrent[date]) {
                             // 若開始時間是已經被預約的期間, 則回傳時間衝突
                             if((new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].end) > begin) || (new Date(reservationCurrent[date][key].start) < stop && new Date(reservationCurrent[date][key].end) >= stop)) {
@@ -95,11 +95,11 @@ router.post('/:department/:space', function(req, res) {
                             console.log('時間未衝突');
                         }
                     }
-                    // 非重複性即可結束判斷
+                    // 非重複性預約則結束迴圈
                     if(requestObject.repeat == 'none') {
-                        console.log('非重複');
                         break;
-                    } else if(new Date(requestObject.repeat_end) > begin) {
+                    // 判斷是否已到終止日期
+                    } else {
                         console.log('重複直到: ' + new Date(requestObject.repeat_end));
                         switch(requestObject.repeat) {
                             case 'daily':
@@ -125,8 +125,9 @@ router.post('/:department/:space', function(req, res) {
                                 return;
                         }
                         console.log(begin, stop);
-                    } else {
-                        break;
+                        if(new Date(requestObject.repeat_end) > stop) {
+                            break;
+                        }
                     }
                 }
             }
