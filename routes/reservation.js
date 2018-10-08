@@ -5,32 +5,40 @@ var router = express.Router();
 router.get('/:department/:space', function(req, res) {
     let department = req.params.department;
     let space = req.params.space;
-    ref = req.database.ref('/reservation/');
-    ref.once('value').then(function(snapshot) {
-        let reservation = snapshot.val();
-        if(reservation.hasOwnProperty(department) && reservation[department].hasOwnProperty(space)) {
-            res.status(200).send(reservation[department][space]);
+    ref = req.database.ref('/reservation');
+    ref.once("value").then(function(snapshot) {
+        let reservationObject = snapshot.val();
+        if(reservationObject.hasOwnProperty(department)) {
+            ref = req.database.ref('/reservation/' + department);
+            ref.once("value").then(function(department_snapshot) {
+                let departmentObject = department_snapshot.val();
+                if(departmentObject.hasOwnProperty(space)) {
+                    res.status(200).send(departmentObject[space]);
+                } else {
+                    res.status(404).send('找不到該空間資料');
+                }
+            });
         } else {
-            res.status(404).send(false);
+            res.status(404).send('找不到該院別資料');
         }
     });
 });
 /* 獲得各院空間預約資訊 */
 router.get('/:department', function(req, res) {
     let department = req.params.department;
-    ref = req.database.ref('/reservation/');
-    ref.once('value').then(function(snapshot) {
-        let reservation = snapshot.val();
-        if(reservation.hasOwnProperty(department)) {
-            res.status(200).send(reservation[department]);
+    ref = req.database.ref('/reservation');
+    ref.once("value").then(function(snapshot) {
+        let reservationObject = snapshot.val();
+        if(reservationObject.hasOwnProperty(department)) {
+            res.status(200).send(reservationObject[department]);
         } else {
-            res.status(404).send(false);
+            res.status(404).send('找不到該院別資料');
         }
     });
 });
 /* 獲得全部空間預約資訊 */
 router.get('/', function(req, res) {
-    ref = req.database.ref('/reservation/');
+    ref = req.database.ref('/reservation');
     ref.once('value').then(function(snapshot) {
         let reservation = snapshot.val();
         res.status(200).send(reservation);
