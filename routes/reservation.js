@@ -68,7 +68,7 @@ router.post('/:department/:space', function(req, res) {
             }
             // 防止時間顛倒
             console.log('處理時間顛倒');
-            if(new Date(requestObject.start).getTime() > new Date(requestObject.end).getTime() ) {
+            if(new Date(requestObject.start) > new Date(requestObject.end)) {
                 [requestObject.start, requestObject.end] = [requestObject.end, requestObject.start];
             }
             console.log('檢查衝突')
@@ -85,7 +85,7 @@ router.post('/:department/:space', function(req, res) {
                     if(reservationCurrent[date] != undefined) {
                         for(key in reservationCurrent[date]) {
                             // 若開始時間是已經被預約的期間, 則回傳時間衝突
-                            if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
+                            if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) < stop) {
                                 console.log('時間衝突');
                                 res.status(403).send({
                                     "message": "時間衝突"
@@ -144,7 +144,7 @@ router.post('/:department/:space', function(req, res) {
                 ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date);
                 if(reservationCurrent && reservationCurrent[date] != undefined) {
                     for(key in reservationCurrent[date]) {
-                        if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
+                        if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) < stop) {
                             conflict = true;
                             console.log('衝突');
                         }
