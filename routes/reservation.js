@@ -81,7 +81,7 @@ router.post('/:department/:space', function(req, res) {
                 console.log('不允許衝突');
                 while(reservationCurrent != undefined) {
                     let date = new Date(begin).toISOString().slice(0, 10);
-                    console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
+                    console.log('日期檢查: ' + date);
                     if(reservationCurrent[date] != undefined) {
                         for(key in reservationCurrent[date]) {
                             // 若開始時間是已經被預約的期間, 則回傳時間衝突
@@ -138,7 +138,7 @@ router.post('/:department/:space', function(req, res) {
             while(true) {
                 // (年 / 月 / 日)來作為該天預約索引值
                 let date = new Date(begin).toISOString().slice(0, 10);
-                console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
+                console.log('日期檢查: ' + date);
                 // 用來判斷是否有衝突
                 let conflict = false;
                 ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date);
