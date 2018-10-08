@@ -158,8 +158,8 @@ router.post('/:department/:space', function(req, res) {
                         "phone": requestObject.phone,
                         "describe": requestObject.describe,
                         "type": requestObject.type,
-                        "start": begin,
-                        "end": stop,
+                        "start": begin.toISOString(),
+                        "end": stop.toISOString(),
                     };
                     // 如果是重複性預約, 則 repeat 值為 true, 反之
                     if(requestObject.repeat != 'none') {
