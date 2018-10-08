@@ -126,7 +126,7 @@ router.post('/:department/:space', function(req, res) {
                                 return;
                         }
                         console.log(begin, stop);
-                        if(new Date(requestObject.repeat_end) <= stop) {
+                        if(new Date(requestObject.repeat_end) < stop) {
                             break;
                         }
                     }
@@ -218,7 +218,7 @@ router.post('/:department/:space', function(req, res) {
                             return;
                     }
                     console.log(begin, stop);
-                    if(new Date(requestObject.repeat_end) <= stop) {
+                    if(new Date(requestObject.repeat_end) < stop) {
                         break;
                     }
                 }
