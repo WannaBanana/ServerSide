@@ -50,7 +50,7 @@ router.post('/:department/:space', function(req, res) {
     let department = req.params.department;
     let space = req.rarams.space;
     let requestObject = req.body;
-    let verify_fields = [, "name", "phone", "describe", "type", "start", "end", "repeat", "repeat_end", "conflict"];
+    let verify_fields = ["name", "phone", "describe", "type", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
     for(let key in verify_fields) {
         if(!requestObject.hasOwnProperty(verify_fields[key])) {
