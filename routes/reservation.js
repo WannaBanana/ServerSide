@@ -182,7 +182,6 @@ router.post('/:department/:space', function(req, res) {
                     console.log(object);
                     // 將衍伸子預約填回父預約
                     ref.push(object).then((push_snapshot) => {
-                        console.log(push_snapshot.key);
                         if(parentKey != undefined) {
                             ref = req.database.ref('/reservation/' + department + '/' + space + '/');
                             ref.once('value').then(function(snapshot) {
@@ -190,15 +189,13 @@ router.post('/:department/:space', function(req, res) {
                                 for(let date in spaceReservation) {
                                     for(let self_key in spaceReservation[date]) {
                                         if(self_key == parentKey) {
-                                            ref.child(date).child(parentKey).update({"child": push_snapshot.key});
-                                            console.log('找到');
+                                            ref.child(date).child(parentKey).child('child').set(push_snapshot.key);
                                         }
                                     }
                                 }
                             });
                         }
                         parentKey = push_snapshot.key;
-                        console.log(parentKey);
                     });
                     succes++;
                     console.log(parentKey);
