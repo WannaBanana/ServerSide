@@ -180,6 +180,7 @@ router.post('/:department/:space', function(req, res) {
                         object["repeat"] = false;
                     }
                     // 將衍伸子預約填回父預約 Key 值
+                    var arr = [];
                     ref.push(object).then((push_snapshot) => {
                         if(parentKey != undefined) {
                             ref = req.database.ref('/reservation/' + department + '/' + space + '/');
@@ -195,6 +196,8 @@ router.post('/:department/:space', function(req, res) {
                             });
                         }
                         parentKey = push_snapshot.key;
+                        arr.push(push_snapshot.key);
+                        console.log(arr);
                     });
                     succes++;
                 }
