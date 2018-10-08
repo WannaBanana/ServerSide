@@ -48,7 +48,7 @@ router.get('/', function(req, res) {
 /* 預約 */
 router.post('/:department/:space', function(req, res) {
     let department = req.params.department;
-    let space = req.rarams.space;
+    let space = req.params.space;
     let requestObject = req.body;
     let verify_fields = ["name", "phone", "describe", "type", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
