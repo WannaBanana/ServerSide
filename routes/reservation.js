@@ -335,7 +335,7 @@ router.delete('/:department/:space/:key', function(req, res) {
                     if(self_key == key) {
                         find = true;
                         ref.child(date).child(self_key).remove();
-                        if(spaceReservation[date][self_key].hasOwnProperty(child)) {
+                        if(spaceReservation[date][self_key].hasOwnProperty('child')) {
                             childID = spaceReservation[date][self_key]['child'];
                         }
                     }
@@ -353,7 +353,7 @@ router.delete('/:department/:space/:key', function(req, res) {
                         for(let self_key in spaceReservation[date]) {
                             if(self_key == childID) {
                                 ref.child(date).child(self_key).remove();
-                                if(spaceReservation[date][self_key].hasOwnProperty(child)) {
+                                if(spaceReservation[date][self_key].hasOwnProperty('child')) {
                                     childID = spaceReservation[date][self_key]['child'];
                                 } else {
                                     childID = undefined;
