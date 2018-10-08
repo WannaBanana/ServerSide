@@ -190,7 +190,7 @@ router.post('/:department/:space', function(req, res) {
                 if(requestObject.repeat == 'none') {
                     break;
                 // 判斷是否已到終止日期
-                } else if(new Date(requestObject.repeat_end) > begin) {
+                } else {
                     console.log('重複直到: ' + new Date(requestObject.repeat_end));
                     switch(requestObject.repeat) {
                         case 'daily':
@@ -216,8 +216,9 @@ router.post('/:department/:space', function(req, res) {
                             return;
                     }
                     console.log(begin, stop);
-                } else {
-                    break;
+                    if(new Date(requestObject.repeat_end) > stop) {
+                        break;
+                    }
                 }
             }
             res.status(200).send({
