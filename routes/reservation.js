@@ -274,7 +274,7 @@ router.patch('/:department/:space/:key', function(req, res) {
                         let begin = new Date(requestObject.start);
                         let stop = new Date(requestObject.end);
                         for(let item in spaceReservation[date]) {
-                            if((new Date(reservationCurrent[date][item].start) <= begin && new Date(reservationCurrent[date][item].end) > begin) || (new Date(reservationCurrent[date][item].start) < stop && new Date(reservationCurrent[date][item].end) >= stop)) {
+                            if((new Date(spaceReservation[date][item].start) <= begin && new Date(spaceReservation[date][item].end) > begin) || (new Date(spaceReservation[date][item].start) < stop && new Date(spaceReservation[date][item].end) >= stop)) {
                                 res.status(403).send({
                                     "message": "時間衝突"
                                 });
