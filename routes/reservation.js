@@ -179,8 +179,7 @@ router.post('/:department/:space', function(req, res) {
                     } else {
                         object["repeat"] = false;
                     }
-                    console.log(object);
-                    // 將衍伸子預約填回父預約
+                    // 將衍伸子預約填回父預約 Key 值
                     ref.push(object).then((push_snapshot) => {
                         if(parentKey != undefined) {
                             ref = req.database.ref('/reservation/' + department + '/' + space + '/');
@@ -189,7 +188,7 @@ router.post('/:department/:space', function(req, res) {
                                 for(let date in spaceReservation) {
                                     for(let self_key in spaceReservation[date]) {
                                         if(self_key == parentKey) {
-                                            ref.child(date).child(parentKey).child('child').set(push_snapshot.key);
+                                            ref.child(date).child(parentKey).child('child').set(parentKey);
                                         }
                                     }
                                 }
@@ -198,7 +197,6 @@ router.post('/:department/:space', function(req, res) {
                         parentKey = push_snapshot.key;
                     });
                     succes++;
-                    console.log(parentKey);
                 }
                 // 非重複性預約則結束迴圈
                 if(requestObject.repeat == 'none') {
