@@ -64,34 +64,44 @@ router.post('/:department/:space', function(req, res) {
             // 如果有資料的情況
             if(snapshot.hasChildren()) {
                 reservationCurrent = snapshot.val();
+                console.log('有資料: ' + reservationCurrent);
             }
+            console.log('沒資料')
         });
         // 防止時間顛倒
+        console.log('處理時間顛倒');
         if(new Date(requestObject.start) > new Date(requestObject.end) ) {
             [requestObject.start, requestObject.end] = [requestObject.end, requestObject.start];
         }
+        console.log('檢查衝突')
         // 檢查衝突, 在禁止衝突的情況
         let begin = new Date(requestObject.start);
         let stop = new Date(requestObject.end);
+        console.log('Start: ' + begin + ', end: ' + stop);
         // 不允許衝突情況下需檢查衝突
         if(requestObject.conflict == false) {
             while(reservationCurrent != undefined) {
                 let date = new Date(begin).toISOString().slice(0, 10);
+                console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
                 if(reservationCurrent[date] != undefined) {
                     for(key in reservationCurrent[date]) {
                         // 若開始時間是已經被預約的期間, 則回傳時間衝突
                         if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
+                            console.log('時間衝突');
                             res.status(403).send({
                                 "message": "時間衝突"
                             });
                             return;
                         }
+                        console.log('時間未衝突');
                     }
                 }
                 // 非重複性即可結束判斷
                 if(requestObject.repeat == 'none') {
+                    console.log('非重複');
                     break;
                 } else if(new Date(requestObject.repeat_end) > begin) {
+                    console.log('重複直到: ' + new Date(requestObject.repeat_end));
                     switch(requestObject.repeat) {
                         case 'daily':
                             begin.setDate(begin.getDate() + 1);
@@ -115,17 +125,21 @@ router.post('/:department/:space', function(req, res) {
                             });
                             return;
                     }
+                    console.log(begin, stop);
                 } else {
                     break;
                 }
             }
         }
         // 插入預約
+        console.log('插入預約');
         let parentKey = undefined;
         [begin, stop] = [new Date(requestObject.start), new Date(requestObject.end)];
+        console.log('Start: ' + begin + ', end: ' + stop);
         while(reservationCurrent != undefined) {
             // (年 / 月 / 日)來作為該天預約索引值
             let date = new Date(begin).toISOString().slice(0, 10);
+            console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
             // 用來判斷是否有衝突
             let conflict = false;
             ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date);
@@ -133,10 +147,12 @@ router.post('/:department/:space', function(req, res) {
                 for(key in reservationCurrent[date]) {
                     if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
                         conflict = true;
+                        console.log('衝突');
                     }
                 }
             }
             if(conflict == false) {
+                console.log('未衝突');
                 // 預先填入資料
                 let object = {
                     "name": requestObject.name,
@@ -156,13 +172,16 @@ router.post('/:department/:space', function(req, res) {
                 if(parentKey != undefined) {
                     object["parent"] = parentKey;
                 }
+                console.log(object);
                 parentKey = ref.push(object).key;
+                console.log(parentKey);
             }
             // 非重複性預約則結束迴圈
             if(requestObject.repeat == 'none') {
                 break;
             // 判斷是否已到終止日期
             } else if(new Date(requestObject.repeat_end) > begin) {
+                console.log('重複直到: ' + new Date(requestObject.repeat_end));
                 switch(requestObject.repeat) {
                     case 'daily':
                         begin.setDate(begin.getDate() + 1);
@@ -186,6 +205,7 @@ router.post('/:department/:space', function(req, res) {
                         });
                         return;
                 }
+                console.log(begin, stop);
             } else {
                 break;
             }
