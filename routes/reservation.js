@@ -46,7 +46,7 @@ router.get('/', function(req, res) {
 });
 
 /* 預約 */
-router.post('/', function(req, res) {
+router.post('/:department/:space', function(req, res) {
     let requestObject = req.body;
     let verify_fields = ["department", "space", "name", "phone", "describe", "type", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
@@ -196,7 +196,7 @@ router.post('/', function(req, res) {
 });
 
 /* 修改預約 */
-router.post('/:department/:space/:key', function(req, res) {
+router.patch('/:department/:space/:key', function(req, res) {
     let key = req.params.key;
     let department = req.params.department;
     let space = req.params.department;
