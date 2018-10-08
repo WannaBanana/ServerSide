@@ -142,7 +142,7 @@ router.post('/:department/:space', function(req, res) {
                 // 用來判斷是否有衝突
                 let conflict = false;
                 ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date);
-                if(typeof(reservationCurrent[date]) != undefined) {
+                if(reservationCurrent && reservationCurrent[date] != undefined) {
                     for(key in reservationCurrent[date]) {
                         if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
                             conflict = true;
