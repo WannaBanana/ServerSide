@@ -261,9 +261,10 @@ router.patch('/:department/:space/:key', function(req, res) {
     console.log('key: ' + key);
     console.log(requestObject);
     if(lack_fields.length == 0) {
-        ref = req.database.ref('/reservation/' + department + '/' + space);
+        ref = req.database.ref('/reservation/' + department + '/' + space + '/');
         ref.once('value').then(function(snapshot) {
             let spaceReservation = snapshot.val();
+            console.log(spaceReservation);
             for(let date in spaceReservation) {
                 console.log('檢查 ' + date);
                 for(let self_key in spaceReservation[date]) {
