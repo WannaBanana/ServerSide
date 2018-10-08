@@ -50,6 +50,7 @@ router.post('/:department/:space', function(req, res) {
     let department = req.params.department;
     let space = req.params.space;
     let requestObject = req.body;
+    console.log(requestObject);
     let verify_fields = ["name", "phone", "describe", "type", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
     for(let key in verify_fields) {
@@ -79,7 +80,7 @@ router.post('/:department/:space', function(req, res) {
             // 不允許衝突情況下需檢查衝突
             if(requestObject.conflict == false) {
                 console.log('不允許衝突');
-                while(true) {
+                while(reservationCurrent != undefined) {
                     let date = new Date(begin).toISOString().slice(0, 10);
                     console.log('日期檢查: ' + date);
                     if(reservationCurrent && reservationCurrent[date] != undefined) {
