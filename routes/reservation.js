@@ -67,39 +67,118 @@ router.post('/:department/:space', function(req, res) {
                 console.log('有資料: ' + reservationCurrent);
             }
             console.log('沒資料')
-        });
-        // 防止時間顛倒
-        console.log('處理時間顛倒');
-        if(new Date(requestObject.start) > new Date(requestObject.end) ) {
-            [requestObject.start, requestObject.end] = [requestObject.end, requestObject.start];
-        }
-        console.log('檢查衝突')
-        // 檢查衝突, 在禁止衝突的情況
-        let begin = new Date(requestObject.start);
-        let stop = new Date(requestObject.end);
-        console.log('Start: ' + begin + ', end: ' + stop);
-        // 不允許衝突情況下需檢查衝突
-        if(requestObject.conflict == false) {
-            while(reservationCurrent != undefined) {
-                let date = new Date(begin).toISOString().slice(0, 10);
-                console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
-                if(reservationCurrent[date] != undefined) {
-                    for(key in reservationCurrent[date]) {
-                        // 若開始時間是已經被預約的期間, 則回傳時間衝突
-                        if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
-                            console.log('時間衝突');
-                            res.status(403).send({
-                                "message": "時間衝突"
-                            });
-                            return;
+            // 防止時間顛倒
+            console.log('處理時間顛倒');
+            if(new Date(requestObject.start) > new Date(requestObject.end) ) {
+                [requestObject.start, requestObject.end] = [requestObject.end, requestObject.start];
+            }
+            console.log('檢查衝突')
+            // 檢查衝突, 在禁止衝突的情況
+            let begin = new Date(requestObject.start);
+            let stop = new Date(requestObject.end);
+            console.log('Start: ' + begin + ', end: ' + stop);
+            // 不允許衝突情況下需檢查衝突
+            if(requestObject.conflict == false) {
+                while(reservationCurrent != undefined) {
+                    let date = new Date(begin).toISOString().slice(0, 10);
+                    console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
+                    if(reservationCurrent[date] != undefined) {
+                        for(key in reservationCurrent[date]) {
+                            // 若開始時間是已經被預約的期間, 則回傳時間衝突
+                            if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
+                                console.log('時間衝突');
+                                res.status(403).send({
+                                    "message": "時間衝突"
+                                });
+                                return;
+                            }
+                            console.log('時間未衝突');
                         }
-                        console.log('時間未衝突');
+                    }
+                    // 非重複性即可結束判斷
+                    if(requestObject.repeat == 'none') {
+                        console.log('非重複');
+                        break;
+                    } else if(new Date(requestObject.repeat_end) > begin) {
+                        console.log('重複直到: ' + new Date(requestObject.repeat_end));
+                        switch(requestObject.repeat) {
+                            case 'daily':
+                                begin.setDate(begin.getDate() + 1);
+                                stop.setDate(stop.getDate() + 1);
+                                break;
+                            case 'weekly':
+                                begin.setDate(begin.getDate() + 7);
+                                stop.setDate(stop.getDate() + 7);
+                                break;
+                            case 'biweekly':
+                                begin.setDate(begin.getDate() + 14);
+                                stop.setDate(stop.getDate() + 14);
+                                break;
+                            case 'monthly':
+                                begin.setMonth(begin.getMonth() + 1);
+                                stop.setMonth(stop.getMonth() + 1);
+                                break;
+                            default:
+                                res.status(403).send({
+                                    "message": "重複格式錯誤"
+                                });
+                                return;
+                        }
+                        console.log(begin, stop);
+                    } else {
+                        break;
                     }
                 }
-                // 非重複性即可結束判斷
+            }
+            // 插入預約
+            console.log('插入預約');
+            let parentKey = undefined;
+            [begin, stop] = [new Date(requestObject.start), new Date(requestObject.end)];
+            console.log('Start: ' + begin + ', end: ' + stop);
+            while(reservationCurrent != undefined) {
+                // (年 / 月 / 日)來作為該天預約索引值
+                let date = new Date(begin).toISOString().slice(0, 10);
+                console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
+                // 用來判斷是否有衝突
+                let conflict = false;
+                ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date);
+                if(reservationCurrent[date] != undefined) {
+                    for(key in reservationCurrent[date]) {
+                        if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
+                            conflict = true;
+                            console.log('衝突');
+                        }
+                    }
+                }
+                if(conflict == false) {
+                    console.log('未衝突');
+                    // 預先填入資料
+                    let object = {
+                        "name": requestObject.name,
+                        "phone": requestObject.phone,
+                        "describe": requestObject.describe,
+                        "type": requestObject.type,
+                        "start": begin,
+                        "end": stop,
+                    };
+                    // 如果是重複性預約, 則 repeat 值為 true, 反之
+                    if(requestObject.repeat != 'none') {
+                        object["repeat"] = true;
+                    } else {
+                        object["repeat"] = false;
+                    }
+                    // 如果有父預約 Key 則帶上該值, 第一筆預約沒有上層, 故 repeat 為 true 且無 parent 屬性
+                    if(parentKey != undefined) {
+                        object["parent"] = parentKey;
+                    }
+                    console.log(object);
+                    parentKey = ref.push(object).key;
+                    console.log(parentKey);
+                }
+                // 非重複性預約則結束迴圈
                 if(requestObject.repeat == 'none') {
-                    console.log('非重複');
                     break;
+                // 判斷是否已到終止日期
                 } else if(new Date(requestObject.repeat_end) > begin) {
                     console.log('重複直到: ' + new Date(requestObject.repeat_end));
                     switch(requestObject.repeat) {
@@ -130,86 +209,7 @@ router.post('/:department/:space', function(req, res) {
                     break;
                 }
             }
-        }
-        // 插入預約
-        console.log('插入預約');
-        let parentKey = undefined;
-        [begin, stop] = [new Date(requestObject.start), new Date(requestObject.end)];
-        console.log('Start: ' + begin + ', end: ' + stop);
-        while(reservationCurrent != undefined) {
-            // (年 / 月 / 日)來作為該天預約索引值
-            let date = new Date(begin).toISOString().slice(0, 10);
-            console.log('日期檢查: ' + date, 'Object: ' + reservationCurrent[date]);
-            // 用來判斷是否有衝突
-            let conflict = false;
-            ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date);
-            if(reservationCurrent[date] != undefined) {
-                for(key in reservationCurrent[date]) {
-                    if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
-                        conflict = true;
-                        console.log('衝突');
-                    }
-                }
-            }
-            if(conflict == false) {
-                console.log('未衝突');
-                // 預先填入資料
-                let object = {
-                    "name": requestObject.name,
-                    "phone": requestObject.phone,
-                    "describe": requestObject.describe,
-                    "type": requestObject.type,
-                    "start": begin,
-                    "end": stop,
-                };
-                // 如果是重複性預約, 則 repeat 值為 true, 反之
-                if(requestObject.repeat != 'none') {
-                    object["repeat"] = true;
-                } else {
-                    object["repeat"] = false;
-                }
-                // 如果有父預約 Key 則帶上該值, 第一筆預約沒有上層, 故 repeat 為 true 且無 parent 屬性
-                if(parentKey != undefined) {
-                    object["parent"] = parentKey;
-                }
-                console.log(object);
-                parentKey = ref.push(object).key;
-                console.log(parentKey);
-            }
-            // 非重複性預約則結束迴圈
-            if(requestObject.repeat == 'none') {
-                break;
-            // 判斷是否已到終止日期
-            } else if(new Date(requestObject.repeat_end) > begin) {
-                console.log('重複直到: ' + new Date(requestObject.repeat_end));
-                switch(requestObject.repeat) {
-                    case 'daily':
-                        begin.setDate(begin.getDate() + 1);
-                        stop.setDate(stop.getDate() + 1);
-                        break;
-                    case 'weekly':
-                        begin.setDate(begin.getDate() + 7);
-                        stop.setDate(stop.getDate() + 7);
-                        break;
-                    case 'biweekly':
-                        begin.setDate(begin.getDate() + 14);
-                        stop.setDate(stop.getDate() + 14);
-                        break;
-                    case 'monthly':
-                        begin.setMonth(begin.getMonth() + 1);
-                        stop.setMonth(stop.getMonth() + 1);
-                        break;
-                    default:
-                        res.status(403).send({
-                            "message": "重複格式錯誤"
-                        });
-                        return;
-                }
-                console.log(begin, stop);
-            } else {
-                break;
-            }
-        }
+        });
     } else {
         res.status(403).send({
             "message": '缺少' + lack_fields.join(', ') + '欄位'
