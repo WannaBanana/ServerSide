@@ -47,8 +47,10 @@ router.get('/', function(req, res) {
 
 /* 預約 */
 router.post('/:department/:space', function(req, res) {
+    let department = req.params.department;
+    let space = req.rarams.space;
     let requestObject = req.body;
-    let verify_fields = ["department", "space", "name", "phone", "describe", "type", "start", "end", "repeat", "repeat_end", "conflict"];
+    let verify_fields = [, "name", "phone", "describe", "type", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
     for(let key in verify_fields) {
         if(!requestObject.hasOwnProperty(verify_fields[key])) {
@@ -57,7 +59,7 @@ router.post('/:department/:space', function(req, res) {
     }
     if(lack_fields.length == 0) {
         let reservationCurrent = undefined;
-        ref = req.database.ref('/reservation/' + requestObject.department + '/' + requestObject.space + '/');
+        ref = req.database.ref('/reservation/' + department + '/' + space + '/');
         ref.once('value').then(function(snapshot) {
             // 如果有資料的情況
             if(snapshot.hasChildren()) {
@@ -126,7 +128,7 @@ router.post('/:department/:space', function(req, res) {
             let date = new Date(begin).toISOString().slice(0, 10);
             // 用來判斷是否有衝突
             let conflict = false;
-            ref = req.database.ref('/reservation/' + requestObject.department + '/' + requestObject.space + '/' + date);
+            ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date);
             if(reservationCurrent[date] != undefined) {
                 for(key in reservationCurrent[date]) {
                     if(new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].start) > stop) {
