@@ -179,14 +179,12 @@ router.post('/:department/:space', function(req, res) {
                     } else {
                         object["repeat"] = false;
                     }
-                    // 如果有父預約 Key 則帶上該值, 第一筆預約沒有上層, 故 repeat 為 true 且無 parent 屬性
-                    if(parentKey != undefined) {
-                        object["parent"] = parentKey;
-                    }
                     console.log(object);
                     ref.push(object).then((push_snapshot) => {
+                        if(parentKey != undefined) {
+                            ref.child(parentKey).child('child').setValue(push_snapshot.key);
+                        }
                         parentKey = push_snapshot.key;
-                        console.log(parentKey);
                     })
                     succes++;
                     console.log(parentKey);
