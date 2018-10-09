@@ -96,7 +96,7 @@ router.post('/', function(req, res) {
                 });
                 res.status(200).send(requestObject);
             } else {
-                res.status(406).send({ "message": "該學號已註冊");
+                res.status(406).send({ "message": "該學號已註冊"});
             }
         });
     } else {
