@@ -7,7 +7,7 @@ router.get('/:sid', function(req, res) {
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject.hasOwnProperty(sid)) {
+        if(!userObject && userObject.hasOwnProperty(sid)) {
             userObject = userObject[sid];
             res.status(200).send({
                 "photo": userObject.photo,
