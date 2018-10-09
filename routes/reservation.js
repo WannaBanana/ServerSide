@@ -1,6 +1,37 @@
 var express = require('express');
 var router = express.Router();
 
+/* 查詢單筆預約資訊 */
+router.get('/:department/:space/:key', function(req, res) {
+    let department = req.params.department;
+    let space = req.params.space;
+    let key = req.params.key;
+    ref = req.database.ref('/reservation');
+    ref.once("value").then(function(snapshot) {
+        let reservationObject = snapshot.val();
+        if(reservationObject.hasOwnProperty(department)) {
+            ref = req.database.ref('/reservation/' + department);
+            ref.once("value").then(function(department_snapshot) {
+                let departmentObject = department_snapshot.val();
+                if(departmentObject.hasOwnProperty(space)) {
+                    for(let date in space) {
+                        for(let self_key in date) {
+                            if(self_key == key) {
+                                res.status(200).send(departmentObject[date][key]);
+                                return;
+                            }
+                        }
+                    }
+                    res.status(404).send('找不到該筆預約資料');
+                } else {
+                    res.status(404).send('找不到該空間資料');
+                }
+            });
+        } else {
+            res.status(404).send('找不到該院別資料');
+        }
+    });
+});
 /* 獲得單獨空間預約資訊 */
 router.get('/:department/:space', function(req, res) {
     let department = req.params.department;
