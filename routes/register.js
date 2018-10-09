@@ -86,11 +86,13 @@ router.post('/', function(req, res) {
             if(!userObject.hasOwnProperty(requestObject.student_id)) {
                 ref = req.database.ref('/user/' + requestObject.student_id);
                 ref.set({
+                    "photo": requestObject.photo,
                     "name": requestObject.first_name + requestObject.last_name,
                     "email": requestObject.email,
                     "idenity": "學生",
                     "lineUserID": "null",
                     "password": hash.sha256().update(requestObject.password).digest('hex'),
+                    "cellphone": requestObject.cellphone,
                     "card": [null],
                     "state": "未驗證"
                 });
