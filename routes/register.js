@@ -80,6 +80,10 @@ router.post('/', function(req, res) {
         }
     }
     if(lack_fields.length == 0) {
+        if(requestObject.student_id == '') {
+            res.status(403).send({ "message": "未填學號"});
+            return;
+        }
         ref = req.database.ref('/user');
         ref.once('value').then(function(snapshot) {
             let userObject = snapshot.val();
