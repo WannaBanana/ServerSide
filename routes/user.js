@@ -10,10 +10,12 @@ router.get('/:sid', function(req, res) {
         if(userObject.hasOwnProperty(sid)) {
             userObject = userObject[sid];
             res.status(200).send({
+                "photo": userObject.photo,
                 "name": userObject.name,
                 "department": userObject.department,
                 "identity": userObject.identity,
                 "email": userObject.email,
+                "cellphone": userObject.cellphone,
                 "card": userObject.card,
                 "state": userObject.state
             });
