@@ -39,7 +39,7 @@ router.post('/:sid', function(req, res) {
                         console.log(userCard);
                         for(let key in userCard) {
                             if(userCard[key].cardID == requestObject.cardID) {
-                                res.status(406).send('卡號重複');
+                                res.status(406).send({"message": "卡號重複"});
                                 return;
                             }
                         }
@@ -48,7 +48,7 @@ router.post('/:sid', function(req, res) {
                             "cardName": requestObject.cardName
                         });
                         ref.set(userCard);
-                        res.status(200).send('成功');
+                        res.status(200).send({"message": "登記成功"});
                     } else {
                         let userCard = [];
                         userCard.push({
@@ -56,11 +56,11 @@ router.post('/:sid', function(req, res) {
                             "cardName": requestObject.cardName
                         });
                         ref.set(userCard);
-                        res.status(200).send('成功');
+                        res.status(200).send({"message": "登記成功"});
                     }
                 });
             } else {
-                res.status(406).send('找不到該學號');
+                res.status(404).send({"message": "找不到該學號"});
             }
         });
     } else {
@@ -96,11 +96,11 @@ router.post('/', function(req, res) {
                 });
                 res.status(200).send(requestObject);
             } else {
-                res.status(406).send('該學號已註冊');
+                res.status(406).send({ "message": "該學號已註冊");
             }
         });
     } else {
-        res.status(403).send('缺少' + lack_fields.join(', ') + '欄位');
+        res.status(403).send({ "message": '缺少 ' + lack_fields.join(', ') + ' 欄位'});
     }
 });
 
@@ -126,13 +126,13 @@ router.patch('/:sid', function(req, res) {
                         }
                     }
                     ref.set(studentObject);
-                    res.status(200).send(requestObject);
+                    res.status(200).send({"message": "修改成功"});
                 } else {
-                    res.status(401).send('密碼驗證錯誤');
+                    res.status(401).send({"message": "密碼驗證錯誤"});
                 }
             });
         } else {
-            res.status(406).send('該學號未註冊');
+            res.status(406).send({"message": "該學號未註冊"});
         }
     });
 });
@@ -159,16 +159,16 @@ router.delete('/:sid/card/:cardID', function(req, res) {
                     if (index > -1) {
                         userCard.splice(index, 1);
                         ref.set(userCard);
-                        res.status(200).send('成功');
+                        res.status(200).send({"message": "刪除成功"});
                     } else {
-                        res.status(406).send('找不到該卡號');
+                        res.status(404).send({"message": "找不到該卡號"});
                     }
                 } else {
-                    res.status(406).send('找不到該卡號');
+                    res.status(404).send({"message": "找不到該卡號"});
                 }
             });
         } else {
-            res.status(406).send('找不到該學號');
+            res.status(404).send({"message": "找不到該學號"});
         }
     });
 });
@@ -176,15 +176,20 @@ router.delete('/:sid/card/:cardID', function(req, res) {
 /* 刪除帳號 */
 router.delete('/:sid', function(req, res) {
     let sid = req.params.sid;
+    let requestObject = req.body;
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
         if(userObject.hasOwnProperty(sid)) {
-            delete userObject[sid];
-            ref.set(userObject);
-            res.status(200).send('成功');
+            if(userObject[sid].password == hash.sha256().update(requestObject.password).digest('hex')) {
+                delete userObject[sid];
+                ref.set(userObject);
+                res.status(200).send({"message": "刪除成功"});
+            } else {
+                res.status(401).send({"message": "密碼驗證錯誤"});
+            }
         } else {
-            res.status(406).send('找不到該學號');
+            res.status(404).send({"message": "找不到該學號"});
         }
     });
 });
