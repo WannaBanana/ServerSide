@@ -9,6 +9,7 @@ var https = require('https');
 var admin = require("firebase-admin");
 var helmet = require('helmet');
 var fs = require('fs');
+var cors = require('cors');
 
 var routes = require('./routes/index');
 var user = require('./routes/user');
@@ -17,6 +18,7 @@ var room = require('./routes/room');
 var reservation = require('./routes/reservation');
 
 var app = express();
+app.use(cors());
 
 const config = require('./ENV.json');
 // Certificate
