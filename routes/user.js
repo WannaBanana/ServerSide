@@ -1,6 +1,71 @@
 var express = require('express');
 var router = express.Router();
 
+/* 取得驗證及非驗證使用者資料 */
+router.get('/verify', function(req, res) {
+    ref = req.database.ref('/user');
+    let responseData = {};
+    let userData = {};
+    ref.orderByChild('state').equalTo('已驗證').on("value", function(snapshot) {
+        let userObject = snapshot.val();
+        if(userObject) {
+            snapshot.forEach(function(data) {
+                userData[data.key] = data.val();
+            });
+        }
+    });
+    responseData['已驗證'] = userData;
+    userData = {};
+    ref.orderByChild('state').equalTo('未驗證').on("value", function(snapshot) {
+        let userObject = snapshot.val();
+        if(userObject) {
+            snapshot.forEach(function(data) {
+                userData[data.key] = data.val();
+            });
+        }
+    });
+    responseData['未驗證'] = userData;
+    res.status(200).send(responseData);
+});
+
+/* 取得驗證或非驗證使用者資料 */
+router.get('/verify/:state', function(req, res) {
+    let state = req.params.state;
+    ref = req.database.ref('/user');
+    switch(state) {
+        case '已驗證':
+            ref.orderByChild('state').equalTo('已驗證').on("value", function(snapshot) {
+                let userObject = snapshot.val();
+                let userData = {};
+                if(userObject) {
+                    snapshot.forEach(function(data) {
+                        userData[data.key] = data.val();
+                    });
+                    res.status(200).send(userData);
+                } else {
+                    res.status(404).send({"message": "找不到使用者資料"});
+                }
+            });
+            break;
+        case '未驗證':
+            ref.orderByChild('state').equalTo('未驗證').on("value", function(snapshot) {
+                let userObject = snapshot.val();
+                let userData = {};
+                if(userObject) {
+                    snapshot.forEach(function(data) {
+                        userData[data.key] = data.val();
+                    });
+                    res.status(200).send(userData);
+                } else {
+                    res.status(404).send({"message": "找不到使用者資料"});
+                }
+            });
+            break;
+        default:
+            res.status(403).send({"message": "未知的狀態"});
+    }
+});
+
 /* 取得使用者資料 */
 router.get('/:sid', function(req, res) {
     let sid = req.params.sid;
@@ -20,7 +85,7 @@ router.get('/:sid', function(req, res) {
                 "state": userObject.state
             });
         } else {
-            res.status(404).send(false);
+            res.status(404).send({"message": "找不到使用者資料"});
         }
     });
 });
