@@ -11,24 +11,25 @@ router.get('/verify', function(req, res) {
         let userObject = snapshot.val();
         if(userObject) {
             snapshot.map(function(data) {
-                userData[data.key] = data.val();
+                promises.push(Promise.resolve(userData[data.key] = data.val()));
             });
         }
     });
-    responseData['已驗證'] = userData;
+    promises.push(Promise.resolve(responseData['已驗證'] = userData));
     userData = {};
     ref.orderByChild('state').equalTo('未驗證').on("value", function(snapshot) {
         let userObject = snapshot.val();
         if(userObject) {
             snapshot.map(function(data) {
-                userData[data.key] = data.val();
+                promises.push(Promise.resolve(userData[data.key] = data.val()));
             });
         }
     });
-    responseData['未驗證'] = userData;
-    setTimeout(()=> {
+    promises.push(Promise.resolve(responseData['未驗證'] = userData));
+
+    Promise.all(promises).then(() => {
         res.status(200).send(responseData);
-    }, 500);
+    });
 });
 
 /* 取得驗證或非驗證使用者資料 */
