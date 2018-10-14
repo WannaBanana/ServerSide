@@ -5,42 +5,18 @@ var router = express.Router();
 router.get('/verify', function(req, res) {
     ref = req.database.ref('/user');
     let responseData = {};
-    let userData = {};
-    var promises = [];
-    ref.orderByChild('state').equalTo('已驗證').on("value", function(snapshot) {
-        let userObject = snapshot.val();
+    ref.orderByChild('state').equalTo('已驗證').on("value", function(verify_snapshot) {
+        let userObject = verify_snapshot.val();
         if(userObject) {
-            snapshot.forEach(function(data) {
-                promises.push(new Promise((resolve, reject) => {
-                    userData[data.key] = data.val();
-                    resolve();
-                }));
-            });
+            responseData['已驗證'] = userObject;
         }
-    });
-    promises.push(new Promise((resolve, reject) => {
-        responseData['已驗證'] = userData;
-        resolve();
-    }));
-    userData = {};
-    ref.orderByChild('state').equalTo('未驗證').on("value", function(snapshot) {
-        let userObject = snapshot.val();
-        if(userObject) {
-            snapshot.forEach(function(data) {
-                promises.push(new Promise((resolve, reject) => {
-                    userData[data.key] = data.val();
-                    resolve();
-                }));
-            });
-        }
-    });
-    promises.push(new Promise((resolve, reject) => {
-        responseData['未驗證'] = userData;
-        resolve();
-    }));
-
-    Promise.all(promises).then(() => {
-        res.status(200).send(responseData);
+        ref.orderByChild('state').equalTo('未驗證').on("value", function(unverify_snapshot) {
+            userObject = unverify_snapshot.val();
+            if(userObject) {
+                responseData['未驗證'] = userObject;
+            }
+            res.status(200).send(responseData);
+        });
     });
 });
 
