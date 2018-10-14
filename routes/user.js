@@ -11,21 +11,33 @@ router.get('/verify', function(req, res) {
         let userObject = snapshot.val();
         if(userObject) {
             snapshot.forEach(function(data) {
-                promises.push(Promise.resolve(userData[data.key] = data.val()));
+                promises.push(new Promise((resolve, reject) => {
+                    userData[data.key] = data.val();
+                    resolve();
+                }));
             });
         }
     });
-    promises.push(Promise.resolve(responseData['已驗證'] = userData));
+    promises.push(new Promise((resolve, reject) => {
+        responseData['已驗證'] = userData;
+        resolve();
+    }));
     userData = {};
     ref.orderByChild('state').equalTo('未驗證').on("value", function(snapshot) {
         let userObject = snapshot.val();
         if(userObject) {
             snapshot.forEach(function(data) {
-                promises.push(Promise.resolve(userData[data.key] = data.val()));
+                promises.push(new Promise((resolve, reject) => {
+                    userData[data.key] = data.val();
+                    resolve();
+                }));
             });
         }
     });
-    promises.push(Promise.resolve(responseData['未驗證'] = userData));
+    promises.push(new Promise((resolve, reject) => {
+        responseData['未驗證'] = userData;
+        resolve();
+    }));
 
     Promise.all(promises).then(() => {
         res.status(200).send(responseData);
