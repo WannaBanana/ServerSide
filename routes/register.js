@@ -101,7 +101,7 @@ router.post('/', function(req, res) {
                     "card": [null],
                     "state": "未驗證"
                 });
-                res.status(200).send(requestObject);
+                res.status(200).send({ "message": "註冊成功"});
             } else {
                 res.status(406).send({ "message": "該學號已註冊"});
             }
