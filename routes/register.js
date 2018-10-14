@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var hash = require('hash.js')
+var crypto = require('crypto');
+const secret = require('./secret.json');
 
 /* 查詢學號是否存在 */
 router.get('/:sid', function(req, res) {
@@ -94,8 +95,8 @@ router.post('/', function(req, res) {
                     "name": requestObject.first_name + requestObject.last_name,
                     "email": requestObject.email,
                     "idenity": "學生",
-                    "lineUserID": "null",
-                    "password": hash.sha256().update(requestObject.password).digest('hex'),
+                    "lineUserID": (crypto.createHmac('sha1', secret.salt).update(crypto.createHmac('md5', secret.salt).update((new Date()).toISOString()).digest('hex')).digest('hex')).slice(0, 5),
+                    "password": crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex'),
                     "cellphone": requestObject.cellphone,
                     "card": [null],
                     "state": "未驗證"
