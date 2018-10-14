@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
-const secret = require('./secret.json');
+const secret = require('../secret.json');
 
 /* 查詢學號是否存在 */
 router.get('/:sid', function(req, res) {
