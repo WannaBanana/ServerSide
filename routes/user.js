@@ -10,7 +10,7 @@ router.get('/verify', function(req, res) {
     ref.orderByChild('state').equalTo('已驗證').on("value", function(snapshot) {
         let userObject = snapshot.val();
         if(userObject) {
-            snapshot.map(function(data) {
+            snapshot.forEach(function(data) {
                 promises.push(Promise.resolve(userData[data.key] = data.val()));
             });
         }
@@ -20,7 +20,7 @@ router.get('/verify', function(req, res) {
     ref.orderByChild('state').equalTo('未驗證').on("value", function(snapshot) {
         let userObject = snapshot.val();
         if(userObject) {
-            snapshot.map(function(data) {
+            snapshot.forEach(function(data) {
                 promises.push(Promise.resolve(userData[data.key] = data.val()));
             });
         }
