@@ -8,7 +8,7 @@ router.get('/:sid', function(req, res) {
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject.hasOwnProperty(sid)) {
+        if(!userObject || userObject.hasOwnProperty(sid)) {
             res.status(200).send(true);
         } else {
             res.status(406).send(false);
@@ -31,7 +31,7 @@ router.post('/:sid', function(req, res) {
         ref = req.database.ref('/user');
         ref.once('value').then(function(snapshot) {
             let userObject = snapshot.val();
-            if(userObject.hasOwnProperty(sid)) {
+            if(!userObject || userObject.hasOwnProperty(sid)) {
                 ref = req.database.ref('/user/' + sid + '/card');
                 ref.once('value').then(function(card_snapshot) {
                     if(card_snapshot.exists()) {
@@ -118,7 +118,7 @@ router.patch('/:sid', function(req, res) {
     let verify_fields = ["photo", "name", "email", "cellphone"];
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject.hasOwnProperty(sid)) {
+        if(!userObject || userObject.hasOwnProperty(sid)) {
             ref = req.database.ref('/user/' + sid);
             ref.once('value').then(function(student_snapshot) {
                 let studentObject = student_snapshot.val();
@@ -150,7 +150,7 @@ router.delete('/:sid/card/:cardID', function(req, res) {
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject.hasOwnProperty(sid)) {
+        if(!userObject || userObject.hasOwnProperty(sid)) {
             ref = req.database.ref('/user/' + sid + '/card');
             ref.once('value').then(function(card_snapshot) {
                 if(card_snapshot.exists()) {
@@ -186,7 +186,7 @@ router.delete('/:sid', function(req, res) {
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject.hasOwnProperty(sid)) {
+        if(!userObject || userObject.hasOwnProperty(sid)) {
             if(userObject[sid].password == hash.sha256().update(requestObject.password).digest('hex')) {
                 delete userObject[sid];
                 ref.set(userObject);
