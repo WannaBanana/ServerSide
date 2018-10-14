@@ -63,6 +63,7 @@ typings/
 .next
 
 ENV.json
+secret.json
 servicePrivateKey.json
 
 var httpsServer = https.createServer(credentials, app);
