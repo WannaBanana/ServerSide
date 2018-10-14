@@ -6,10 +6,11 @@ router.get('/verify', function(req, res) {
     ref = req.database.ref('/user');
     let responseData = {};
     let userData = {};
+    var promises = [];
     ref.orderByChild('state').equalTo('已驗證').on("value", function(snapshot) {
         let userObject = snapshot.val();
         if(userObject) {
-            snapshot.forEach(function(data) {
+            snapshot.map(function(data) {
                 userData[data.key] = data.val();
             });
         }
@@ -19,13 +20,15 @@ router.get('/verify', function(req, res) {
     ref.orderByChild('state').equalTo('未驗證').on("value", function(snapshot) {
         let userObject = snapshot.val();
         if(userObject) {
-            snapshot.forEach(function(data) {
+            snapshot.map(function(data) {
                 userData[data.key] = data.val();
             });
         }
     });
     responseData['未驗證'] = userData;
-    res.status(200).send(responseData);
+    setTimeout(()=> {
+        res.status(200).send(responseData);
+    }, 500);
 });
 
 /* 取得驗證或非驗證使用者資料 */
