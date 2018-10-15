@@ -27,7 +27,7 @@ const privateKey = fs.readFileSync('/etc/letsencrypt/live/xn--pss23c41retm.tw/pr
 const certificate = fs.readFileSync('/etc/letsencrypt/live/xn--pss23c41retm.tw/cert.pem', 'utf8');
 const ca = fs.readFileSync('/etc/letsencrypt/live/xn--pss23c41retm.tw/chain.pem', 'utf8');
 // firebase key
-const key = require('./servicePrivateKey.json')
+const key = require('./servicePrivateKey.json');
 
 // 初始化 firebase 服務
 admin.initializeApp({
@@ -52,8 +52,8 @@ app.set('view engine', 'ejs');
 
 app.use(favicon());
 app.use(logger('dev'));
-app.use(bodyParser.json({limit: '20mb'}));
-app.use(bodyParser.urlencoded({limit: '20mb'}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(helmet());
@@ -69,7 +69,7 @@ app.use('/api/user', user);
 app.use('/api/register', register);
 app.use('/api/room', room);
 app.use('/api/reservation', reservation);
-app.use('/api/linebot');
+app.use('/api/linebot', linebot);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
