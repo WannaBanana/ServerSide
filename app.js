@@ -16,6 +16,7 @@ var user = require('./routes/user');
 var register = require('./routes/register');
 var room = require('./routes/room');
 var reservation = require('./routes/reservation');
+var linebot = require('./routes/linebot');
 
 var app = express();
 app.use(cors());
@@ -68,6 +69,7 @@ app.use('/api/user', user);
 app.use('/api/register', register);
 app.use('/api/room', room);
 app.use('/api/reservation', reservation);
+app.use('/api/linebot');
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
