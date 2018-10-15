@@ -144,6 +144,26 @@ router.patch('/:sid', function(req, res) {
     });
 });
 
+/* 驗證帳號 */
+router.patch('/verify/:sid', function(req, res) {
+    let sid = req.params.sid;
+    ref = req.database.ref('/user');
+    ref.once('value').then(function(snapshot) {
+        let userObject = snapshot.val();
+        if(userObject || userObject.hasOwnProperty(sid)) {
+            ref = req.database.ref('/user/' + sid);
+            ref.once('value').then(function(student_snapshot) {
+                let studentObject = student_snapshot.val();
+                studentObject.state = '已驗證';
+                ref.set(studentObject);
+                res.status(200).send({"message": "驗證成功"});
+            });
+        } else {
+            res.status(404).send({"message": "找不到該使用者"});
+        }
+    });
+});
+
 /* 刪除卡片 */
 router.delete('/:sid/card/:cardID', function(req, res) {
     let sid = req.params.sid;
