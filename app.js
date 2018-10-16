@@ -16,7 +16,6 @@ var user = require('./routes/user');
 var register = require('./routes/register');
 var room = require('./routes/room');
 var reservation = require('./routes/reservation');
-var linebot = require('./routes/linebot');
 
 var app = express();
 app.use(cors());
@@ -52,8 +51,8 @@ app.set('view engine', 'ejs');
 
 app.use(favicon());
 app.use(logger('dev'));
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(helmet());
@@ -69,7 +68,6 @@ app.use('/api/user', user);
 app.use('/api/register', register);
 app.use('/api/room', room);
 app.use('/api/reservation', reservation);
-app.use('/api/linebot', linebot);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
@@ -84,6 +82,7 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
+        console.log(err);
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
@@ -95,6 +94,7 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+    console.log(err);
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
