@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var http = require('http');
 var https = require('https');
+var linebot = require('linebot');
 var admin = require("firebase-admin");
 var helmet = require('helmet');
 var fs = require('fs');
@@ -16,7 +17,6 @@ var user = require('./routes/user');
 var register = require('./routes/register');
 var room = require('./routes/room');
 var reservation = require('./routes/reservation');
-var linebot = require('./routes/linebot');
 
 var app = express();
 app.use(cors());
@@ -63,13 +63,23 @@ app.use(function(req, res, next) {
     next();
 });
 
-
 app.use('/', routes);
 app.use('/api/user', user);
 app.use('/api/register', register);
 app.use('/api/room', room);
 app.use('/api/reservation', reservation);
-app.use('/api/linebot', linebot);
+
+var bot = linebot({
+    channelId: config.line_channelID,
+    channelSecret: config.line_Secret,
+    channelAccessToken: config.line_accessToken
+});
+
+  bot.on('message', function(event) {
+    console.log(event); //把收到訊息的 event 印出來看看
+});
+
+app.post('/api/linebot', linebotParser);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
