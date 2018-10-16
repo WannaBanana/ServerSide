@@ -157,9 +157,11 @@ router.patch('/verify/:sid', function(req, res) {
                 studentObject.state = '已驗證';
                 ref.set(studentObject);
                 res.status(200).send({"message": "驗證成功"});
+                return;
             });
         } else {
             res.status(404).send({"message": "找不到該使用者"});
+            return;
         }
     });
 });
