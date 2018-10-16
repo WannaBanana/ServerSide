@@ -17,6 +17,7 @@ var user = require('./routes/user');
 var register = require('./routes/register');
 var room = require('./routes/room');
 var reservation = require('./routes/reservation');
+var linebot = require('./routes/linebot');
 
 var app = express();
 app.use(cors());
@@ -52,8 +53,7 @@ app.set('view engine', 'ejs');
 
 app.use(favicon());
 app.use(logger('dev'));
-app.use(bodyParser.urlencoded());
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({"extended": false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(helmet());
@@ -68,18 +68,7 @@ app.use('/api/user', user);
 app.use('/api/register', register);
 app.use('/api/room', room);
 app.use('/api/reservation', reservation);
-
-var bot = linebot({
-    channelId: config.line_channelID,
-    channelSecret: config.line_Secret,
-    channelAccessToken: config.line_accessToken
-});
-
-  bot.on('message', function(event) {
-    console.log(event); //把收到訊息的 event 印出來看看
-});
-
-app.post('/api/linebot', linebotParser);
+app.use('/api/linebot', linebot);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {

@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var linebot = require('linebot');
 var bodyParser = require('body-parser');
-var config = require('./ENV.json');
+var config = require('../ENV.json');
 
 const bot = linebot({
     channelId: config.line_channelID,
