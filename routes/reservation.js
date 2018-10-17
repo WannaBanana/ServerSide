@@ -80,9 +80,8 @@ router.get('/', function(req, res) {
 router.post('/:department/:space', function(req, res) {
     let department = req.params.department;
     let space = req.params.space;
-    let requestObject = req.body;
-    console.log(requestObject);
-    let verify_fields = ["name", "phone", "describe", "type", "start", "end", "repeat", "repeat_end", "conflict"];
+    let requestObject = JSON.parse(JSON.stringify(req.body));
+    let verify_fields = ["name", "phone", "title", "type", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
     for(let key in verify_fields) {
         if(!requestObject.hasOwnProperty(verify_fields[key])) {
@@ -198,7 +197,7 @@ router.post('/:department/:space', function(req, res) {
                     let object = {
                         "name": requestObject.name,
                         "phone": requestObject.phone,
-                        "describe": requestObject.describe,
+                        "title": requestObject.title,
                         "type": requestObject.type,
                         "start": begin.toISOString(),
                         "end": stop.toISOString(),
@@ -281,8 +280,8 @@ router.patch('/:department/:space/:key', function(req, res) {
     let key = req.params.key;
     let department = req.params.department;
     let space = req.params.space;
-    let requestObject = req.body;
-    let verify_fields = ["describe", "type", "start", "end"];
+    let requestObject = JSON.parse(JSON.stringify(req.body));
+    let verify_fields = ["title", "type", "start", "end"];
     let lack_fields = [];
     for(let key in verify_fields) {
         if(!requestObject.hasOwnProperty(verify_fields[key])) {
@@ -319,7 +318,7 @@ router.patch('/:department/:space/:key', function(req, res) {
                         ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date + '/' + self_key);
                         ref.once('value').then(function(targetSnapshot) {
                             let targetObject = targetSnapshot.val();
-                            targetObject["describe"] = requestObject.describe;
+                            targetObject["title"] = requestObject.title;
                             targetObject["type"] = requestObject.type;
                             targetObject["start"] = requestObject.start;
                             targetObject["end"] = requestObject.end;
@@ -347,7 +346,7 @@ router.delete('/:department/:space/:key', function(req, res) {
     let key = req.params.key;
     let department = req.params.department;
     let space = req.params.space;
-    let requestObject = req.body;
+    let requestObject = JSON.parse(JSON.stringify(req.body));
     let verify_fields = ["deleteRepeat"];
     let lack_fields = [];
     for(let key in verify_fields) {
