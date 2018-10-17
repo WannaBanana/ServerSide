@@ -149,11 +149,6 @@ bot.on('message', function (event) {
                 }
                 break;
         }
-        event.reply(message).then(function (data) {
-            console.log('Success', data);
-        }).catch(function (error) {
-            console.log('Error', error);
-        });
     }
 });
 
