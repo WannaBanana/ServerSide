@@ -24,12 +24,34 @@ router.post('/', parser, function (req, res) {
     return res.json({});
 });
 
+bot.on('follow',   function (event) {
+    event.reply({
+        "type": "template",
+        "altText": "this is a buttons template",
+        "template": {
+          "type": "buttons",
+          "actions": [
+            {
+              "type": "message",
+              "label": "立即驗證",
+              "text": "帳號驗證"
+            }
+          ],
+          "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThNUrbkgtLjgyun1P7GEg6wztMMBHmzLs_gCIxs_owciH2jJAo",
+          "title": "歡迎使用 NCNU Space 服務",
+          "text": "請先驗證您的使用者後即可使用服務！"
+        }
+    })
+});
+
 bot.on('message', function (event) {
-    event.reply(event.message.text).then(function (data) {
-        console.log('Success', data);
-    }).catch(function (error) {
-        console.log('Error', error);
-    });
+    if (event.message.type == 'text') {
+        event.reply(event.message.text).then(function (data) {
+            console.log('Success', data);
+        }).catch(function (error) {
+            console.log('Error', error);
+        });
+    }
 });
 
 module.exports = router;
