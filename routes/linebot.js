@@ -147,7 +147,6 @@ bot.on('message', function (event) {
                     }
                     ref = database.ref('/subscreibe');
                 }
-                break;
         }
     }
 });
