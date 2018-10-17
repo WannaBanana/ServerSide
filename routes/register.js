@@ -20,7 +20,7 @@ router.get('/:sid', function(req, res) {
 /* 註冊卡片 */
 router.post('/:sid', function(req, res) {
     let sid = req.params.sid;
-    let requestObject = req.body;
+    let requestObject = JSON.parse(JSON.stringify(req.body));
     let verify_fields = ["cardName", "cardID"];
     let lack_fields = [];
     for(let key in verify_fields) {
@@ -71,7 +71,7 @@ router.post('/:sid', function(req, res) {
 
 /* 新增帳號 */
 router.post('/', function(req, res) {
-    let requestObject = req.body;
+    let requestObject = JSON.parse(JSON.stringify(req.body));
     console.log(requestObject);
     let verify_fields = ["photo", "first_name", "last_name", "email", "password", "student_id", "cellphone"];
     let lack_fields = [];
@@ -114,7 +114,7 @@ router.post('/', function(req, res) {
 /* 修改帳號資料 */
 router.patch('/:sid', function(req, res) {
     let sid = req.params.sid;
-    let requestObject = req.body;
+    let requestObject = JSON.parse(JSON.stringify(req.body));
     ref = req.database.ref('/user');
     let verify_fields = ["photo", "name", "email", "cellphone"];
     ref.once('value').then(function(snapshot) {
@@ -205,7 +205,7 @@ router.delete('/:sid/card/:cardID', function(req, res) {
 /* 刪除帳號 */
 router.delete('/:sid', function(req, res) {
     let sid = req.params.sid;
-    let requestObject = req.body;
+    let requestObject = JSON.parse(JSON.stringify(req.body));
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
