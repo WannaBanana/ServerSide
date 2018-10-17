@@ -3,6 +3,7 @@ var router = express.Router();
 var linebot = require('linebot');
 var bodyParser = require('body-parser');
 var config = require('../ENV.json');
+var database = undefined;
 
 const bot = linebot({
     channelId: config.line_channelID,
@@ -17,6 +18,7 @@ const parser = bodyParser.json({
 });
 
 router.post('/', parser, function (req, res) {
+    database = req.database
     if (!bot.verify(req.rawBody, req.get('X-Line-Signature'))) {
         return res.sendStatus(400);
     }
@@ -45,7 +47,7 @@ bot.on('follow',   function (event) {
 });
 
 bot.on('message', function (event) {
-    let ref = req.database.ref('/user');
+    let ref = database.ref('/user');
     let user = undefined;
     ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(snapshot) {
         let userData = snapshot.val();
@@ -135,7 +137,7 @@ bot.on('message', function (event) {
                 if(message.split("subscribe=").length == 2) {
                     let subscribeSpace = message.split("subscribe=")[1];
                     if(user) {
-                        ref = req.database.ref('/subscribe/' + user);
+                        ref = database.ref('/subscribe/' + user);
                         
                     } else {
                         event.reply({
@@ -143,7 +145,7 @@ bot.on('message', function (event) {
                             "text": "請先綁定帳號"
                         });
                     }
-                    ref = req.database.ref('/subscreibe');
+                    ref = database.ref('/subscreibe');
                 }
                 break;
         }
