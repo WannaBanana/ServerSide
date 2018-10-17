@@ -59,8 +59,8 @@ bot.on('message', function (event) {
         }
     });
     if (event.message.type == 'text') {
-        let mseeage = event.message.text;
-        switch(mseeage) {
+        let message = event.message.text;
+        switch(message) {
             case '帳號驗證':
                 event.reply({
                     "type": "text",
@@ -149,7 +149,7 @@ bot.on('message', function (event) {
                 }
                 break;
         }
-        event.reply(mseeage).then(function (data) {
+        event.reply(message).then(function (data) {
             console.log('Success', data);
         }).catch(function (error) {
             console.log('Error', error);
