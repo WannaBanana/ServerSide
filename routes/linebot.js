@@ -27,7 +27,7 @@ router.post('/', parser, function (req, res) {
 bot.on('follow',   function (event) {
     event.reply({
         "type": "template",
-        "altText": "this is a buttons template",
+        "altText": "請使用手機接收本訊息",
         "template": {
           "type": "buttons",
           "actions": [
@@ -45,8 +45,109 @@ bot.on('follow',   function (event) {
 });
 
 bot.on('message', function (event) {
+    let ref = req.database.ref('/user');
+    let user = undefined;
+    ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(snapshot) {
+        let userData = snapshot.val();
+        if(userData) {
+            for(let key in userData) {
+                user = key;
+                break;
+            }
+        }
+    });
     if (event.message.type == 'text') {
-        event.reply(event.message.text).then(function (data) {
+        let mseeage = event.message.text;
+        switch(mseeage) {
+            case '帳號驗證':
+                event.reply({
+                    "type": "text",
+                    "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
+                });
+                break;
+            case '協助':
+                event.reply({
+                    "type": "template",
+                    "altText": "請使用手機接收本訊息",
+                    "template": {
+                      "type": "buttons",
+                      "actions": [
+                        {
+                          "type": "message",
+                          "label": "訂閱教室",
+                          "text": "訂閱"
+                        },
+                        {
+                          "type": "message",
+                          "label": "取消訂閱",
+                          "text": "取消訂閱"
+                        },
+                        {
+                          "type": "message",
+                          "label": "查看空間",
+                          "text": "查看"
+                        }
+                      ],
+                      "title": "指令清單",
+                      "text": "請點選下方指令執行動作"
+                    }
+                  });
+                break;
+            case '訂閱':
+                event.reply({
+                    "type": "text",
+                    "text": "請輸入： “subscribe=空間” 來訂閱空間，空間名稱範例：「管241」"
+                });
+                break;
+            case '取消訂閱':
+                break;
+            case '查看空間':
+                break;
+            case '解除連結':
+                break;
+            default:
+                if(message.split("user=").length == 2) {
+                    let userCode = message.split("user=")[1];
+                    ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
+                        let userData = snapshot.val();
+                        let userKey = undefined;
+                        if(userData) {
+                            for(let key in userData) {
+                                userKey = key;
+                                break;
+                            }
+                            if(userKey) {
+                                userData[userKey].lineUserID = event.source.userId;
+                                ref.child(userKey).set(userData[userKey]);
+                                event.reply({
+                                    "type": "text",
+                                    "text": "使用者: " + userData[userKey].name + " 綁定成功!"
+                                });
+                            }
+                        } else {
+                            event.reply({
+                                "type": "text",
+                                "text": "綁定失敗, 查無此驗證碼: " + userCode
+                            });
+                        }
+                    });
+                }
+                if(message.split("subscribe=").length == 2) {
+                    let subscribeSpace = message.split("subscribe=")[1];
+                    if(user) {
+                        ref = req.database.ref('/subscribe/' + user);
+                        
+                    } else {
+                        event.reply({
+                            "type": "text",
+                            "text": "請先綁定帳號"
+                        });
+                    }
+                    ref = req.database.ref('/subscreibe');
+                }
+                break;
+        }
+        event.reply(mseeage).then(function (data) {
             console.log('Success', data);
         }).catch(function (error) {
             console.log('Error', error);
