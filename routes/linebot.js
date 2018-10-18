@@ -230,19 +230,22 @@ bot.on('message', function (event) {
                     let userCode = message.split("user=")[1];
                     ref = database.ref('/user');
                     ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(search_snapshot) {
-                        let searchData = search_snapshot.val();
-                        console.log(searchData);
-                        if(searchData) {
-                            for(let key in searchData) {
-                                ref.child(key).child('lineUserID').set(event.source.userId).then(function() {
-                                    event.reply({
-                                        "type": "text",
-                                        "text": "使用者: " + searchData[key].name + " 綁定成功!"
-                                    });
-                                });
+                        let userData = snapshot.val();
+                        let userKey = undefined;
+                        if(userData) {
+                            for(let key in userData) {
+                                userKey = key;
                                 break;
                             }
-                        } else if(searchData == undefined) {
+                            if(userKey) {
+                                userData[userKey].lineUserID = event.source.userId;
+                                ref.child(userKey).set(userData[userKey]);
+                                event.reply({
+                                    "type": "text",
+                                    "text": "使用者: " + userData[userKey].name + " 綁定成功!"
+                                });
+                            }
+                        } else {
                             event.reply({
                                 "type": "text",
                                 "text": "綁定失敗, 查無此驗證碼: " + userCode
