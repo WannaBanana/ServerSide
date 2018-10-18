@@ -3,6 +3,8 @@ var router = express.Router();
 var linebot = require('linebot');
 var bodyParser = require('body-parser');
 var config = require('../ENV.json');
+var crypto = require('crypto');
+const secret = require('../secret.json');
 var database = undefined;
 
 const bot = linebot({
@@ -48,6 +50,7 @@ bot.on('follow',   function (event) {
 
 bot.on('message', function (event) {
     let ref = database.ref('/user');
+    let message = event.message.text;
     let user = undefined;
     ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(snapshot) {
         let userData = snapshot.val();
@@ -57,57 +60,152 @@ bot.on('message', function (event) {
                 break;
             }
         }
-    });
-    if (event.message.type == 'text') {
-        let message = event.message.text;
-        switch(message) {
-            case '帳號驗證':
-                event.reply({
-                    "type": "text",
-                    "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
-                });
-                break;
-            case '協助':
-                event.reply({
-                    "type": "template",
-                    "altText": "請使用手機接收本訊息",
-                    "template": {
-                      "type": "buttons",
-                      "actions": [
-                        {
-                          "type": "message",
-                          "label": "訂閱教室",
-                          "text": "訂閱"
-                        },
-                        {
-                          "type": "message",
-                          "label": "取消訂閱",
-                          "text": "取消訂閱"
-                        },
-                        {
-                          "type": "message",
-                          "label": "查看空間",
-                          "text": "查看"
-                        }
-                      ],
-                      "title": "指令清單",
-                      "text": "請點選下方指令執行動作"
-                    }
-                  });
-                break;
-            case '訂閱':
-                event.reply({
-                    "type": "text",
-                    "text": "請輸入： “subscribe=空間” 來訂閱空間，空間名稱範例：「管241」"
-                });
-                break;
-            case '取消訂閱':
-                break;
-            case '查看空間':
-                break;
-            case '解除連結':
-                break;
-            default:
+        if(user) {
+            // 使用者已登記
+            if(event.message.type == 'text') {
+                switch(message) {
+                    case '選單':
+                        event.reply({
+                            "type": "template",
+                            "altText": "請使用手機接收本訊息",
+                            "template": {
+                              "type": "buttons",
+                              "actions": [
+                                {
+                                  "type": "message",
+                                  "label": "訂閱教室",
+                                  "text": "新增訂閱"
+                                },
+                                {
+                                  "type": "message",
+                                  "label": "取消訂閱",
+                                  "text": "取消訂閱"
+                                },
+                                {
+                                  "type": "message",
+                                  "label": "管理空間",
+                                  "text": "管理空間"
+                                }
+                              ],
+                              "title": "指令清單",
+                              "text": "請點選下方指令執行動作"
+                            }
+                          });
+                        break;
+                    case '新增訂閱':
+                        ref = database.ref('/permission/' + user);
+                        ref.once("value").then(function(snapshot) {
+                            let permissionObject = snapshot.val();
+                            let button = [];
+                            if(permissionObject) {
+                                for(let department in permissionObject) {
+                                    for(let space in permissionObject[department]) {
+                                        button.push({
+                                            "type": "postback",
+                                            "label": department[0] + space,
+                                            "data": "subscribe&" + department[0] + space
+                                          });
+                                    }
+                                }
+                                event.reply({
+                                    "type": "template",
+                                    "altText": "請使用手機接收本訊息",
+                                    "template": {
+                                      "type": "buttons",
+                                      "actions": button,
+                                      "title": "新增訂閱",
+                                      "text": "請點選下列空間進行訂閱"
+                                    }
+                                  });
+                            } else {
+                                event.reply({
+                                    "type": "text",
+                                    "text": "您目前沒有權限訂閱空間！"
+                                });
+                            }
+                        });
+                        break;
+                    case '取消訂閱':
+                        ref = database.ref('/subscribe/' + user);
+                        ref.once("value").then(function(snapshot) {
+                            let subscribeObject = snapshot.val();
+                            let button = [];
+                            if(subscribeObject) {
+                                for(let department in subscribeObject) {
+                                    for(let space in subscribeObject[department]) {
+                                        button.push({
+                                            "type": "postback",
+                                            "label": department[0] + space,
+                                            "data": "unsubscribe&" + department[0] + space
+                                          });
+                                    }
+                                }
+                                event.reply({
+                                    "type": "template",
+                                    "altText": "請使用手機接收本訊息",
+                                    "template": {
+                                      "type": "buttons",
+                                      "actions": button,
+                                      "title": "解除訂閱",
+                                      "text": "請點選下列空間進行解除訂閱"
+                                    }
+                                  });
+                            } else {
+                                event.reply({
+                                    "type": "text",
+                                    "text": "您目前沒有訂閱的空間！"
+                                });
+                            }
+                        });
+                        break;
+                    case '管理空間':
+                        ref = database.ref('/permission/' + user);
+                        ref.once("value").then(function(snapshot) {
+                            let permissionObject = snapshot.val();
+                            let button = [];
+                            if(permissionObject) {
+                                for(let department in permissionObject) {
+                                    for(let space in permissionObject[department]) {
+                                        button.push({
+                                            "type": "postback",
+                                            "label": department[0] + space,
+                                            "data": "manage&" + department[0] + space
+                                        });
+                                    }
+                                }
+                                event.reply({
+                                    "type": "template",
+                                    "altText": "請使用手機接收本訊息",
+                                    "template": {
+                                    "type": "buttons",
+                                    "actions": button,
+                                    "title": "新增訂閱",
+                                    "text": "請點選下列空間進行管理"
+                                    }
+                                });
+                            } else {
+                                event.reply({
+                                    "type": "text",
+                                    "text": "您目前沒有權限管理空間！"
+                                });
+                            }
+                        });
+                        break;
+                    case '解除連結':
+                        event.reply();
+                        break;
+                    default:
+                }
+            }
+        } else {
+            // 使用者未登記
+            if(event.message.type == 'text') {
+                if(message == '帳號驗證') {
+                    event.reply({
+                        "type": "text",
+                        "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
+                    });
+                }
                 if(message.split("user=").length == 2) {
                     let userCode = message.split("user=")[1];
                     ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
@@ -133,22 +231,180 @@ bot.on('message', function (event) {
                             });
                         }
                     });
+                } else {
+                    event.reply({
+                        "type": "text",
+                        "text": "尚未綁定使用者"
+                    });
                 }
-                if(message.split("subscribe=").length == 2) {
-                    let subscribeSpace = message.split("subscribe=")[1];
-                    if(user) {
-                        ref = database.ref('/subscribe/' + user);
-                        
-                    } else {
+            }
+        }
+    });
+});
+
+bot.on('postback', function (event) {
+    let ref = database.ref('/user');
+    let user = undefined;
+    ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(snapshot) {
+        let userData = snapshot.val();
+        if(userData) {
+            for(let key in userData) {
+                user = key;
+                break;
+            }
+        }
+        if(user) {
+            if (event.postback.data) {
+                let temp = event.postback.data.split("&");
+                switch(temp[0]) {
+                    case 'subscribe':
+                        let departmentCode = temp[1][0];
+                        let space = temp[1].replace(temp[1][0], '');
+                        switch(departmentCode){
+                            case '管':
+                                departmentCode = '管理學院';
+                                break;
+                            case '科':
+                                departmentCode = '科技學院';
+                                break;
+                            case '人':
+                                departmentCode = '人文學院';
+                                break;
+                            case '教':
+                                departmentCode = '教育學院';
+                                break;
+                        }
+                        ref = database.ref('/subscribe/' + user + '/' + departmentCode);
+                        ref.once("value").then(function(snapshot) {
+                            let subscribeObject = snapshot.val();
+                            if(subscribeObject) {
+                                subscribeObject.push(space);
+                                ref.set(subscribeObject).then(function() {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "訂閱成功"
+                                    });
+                                });
+                            } else {
+                                ref.set([space]);
+                                event.reply({
+                                    "type": "text",
+                                    "text": "訂閱成功"
+                                });
+                            }
+                        });
+                        break;
+                    case 'unsubscribe':
+                        let departmentCode = temp[1][0];
+                        let space = temp[1].replace(temp[1][0], '');
+                        switch(departmentCode){
+                            case '管':
+                                departmentCode = '管理學院';
+                                break;
+                            case '科':
+                                departmentCode = '科技學院';
+                                break;
+                            case '人':
+                                departmentCode = '人文學院';
+                                break;
+                            case '教':
+                                departmentCode = '教育學院';
+                                break;
+                        }
+                        ref = database.ref('/subscribe/' + user + '/' + departmentCode);
+                        ref.once("value").then(function(snapshot) {
+                            let subscribeObject = snapshot.val();
+                            if(subscribeObject) {
+                                subscribeObject.splice(subscribeObject.indexOf(space), 1);
+                                ref.set(subscribeObject).then(function() {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "訂閱成功"
+                                    });
+                                })
+                            }
+                        });
+                        break;
+                    case 'manage':
+                        event.reply({
+                            "type": "template",
+                            "altText": "請使用手機接收本訊息",
+                            "template": {
+                                "type": "buttons",
+                                "actions": [
+                                    {
+                                        "type": "postback",
+                                        "label": "即時動態",
+                                        "data": "control&" + temp[1] + "&photo"
+                                    },
+                                    {
+                                        "type": "postback",
+                                        "label": "裝置狀態",
+                                        "data": "control&" + temp[1] + "&state"
+                                    },
+                                    {
+                                        "type": "postback",
+                                        "label": "開門",
+                                        "data": "control&" + temp[1] + "open"
+                                    },
+                                    {
+                                        "type": "postback",
+                                        "label": "關門",
+                                        "data": "control&" + temp[1] + "&close"
+                                    }
+                                ],
+                                "title": temp[1] + " 管理選單",
+                                "text": "請選擇下列功能進行管理"
+                            }
+                          });
+                        break;
+                    case 'control':
+                        let departmentCode = temp[1][0];
+                        let space = temp[1].replace(temp[1][0], '');
+                        switch(departmentCode){
+                            case '管':
+                                departmentCode = '管理學院';
+                                break;
+                            case '科':
+                                departmentCode = '科技學院';
+                                break;
+                            case '人':
+                                departmentCode = '人文學院';
+                                break;
+                            case '教':
+                                departmentCode = '教育學院';
+                                break;
+                        }
+                        break;
+                    case 'cancelVerify':
+                        ref = database.ref('/user/' + user);
+                        ref.once("value").then(function(snapshot) {
+                            let userData = snapshot.val();
+                            if(userData) {
+                                userData.lineUserID = (crypto.createHmac('sha1', secret.salt).update(crypto.createHmac('md5', secret.salt).update((new Date()).toISOString()).digest('hex')).digest('hex')).slice(0, 5);
+                                ref.set(userData).then(function() {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "解除使用者綁定成功"
+                                    });
+                                });
+                            }
+                        });
+                        break;
+                    default:
                         event.reply({
                             "type": "text",
-                            "text": "請先綁定帳號"
+                            "text": "未知的指令"
                         });
-                    }
-                    ref = database.ref('/subscreibe');
                 }
+            }
+        } else {
+            event.reply({
+                "type": "text",
+                "text": "尚未綁定使用者"
+            });
         }
-    }
+    });
 });
 
 module.exports = router;
