@@ -258,7 +258,7 @@ bot.on('postback', function (event) {
                 let temp = event.postback.data.split("&");
                 switch(temp[0]) {
                     case 'subscribe':
-                        let depCode = temp[1][0];
+                        var depCode = temp[1][0];
                         let space = temp[1].replace(temp[1][0], '');
                         switch(depCode){
                             case '管':
@@ -295,7 +295,7 @@ bot.on('postback', function (event) {
                         });
                         break;
                     case 'unsubscribe':
-                        let depCode = temp[1][0];
+                        var depCode = temp[1][0];
                         let space = temp[1].replace(temp[1][0], '');
                         switch(depCode){
                             case '管':
@@ -359,7 +359,7 @@ bot.on('postback', function (event) {
                           });
                         break;
                     case 'control':
-                        let depCode = temp[1][0];
+                        var depCode = temp[1][0];
                         let space = temp[1].replace(temp[1][0], '');
                         switch(depCode){
                             case '管':
