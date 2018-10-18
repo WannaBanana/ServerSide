@@ -258,23 +258,23 @@ bot.on('postback', function (event) {
                 let temp = event.postback.data.split("&");
                 switch(temp[0]) {
                     case 'subscribe':
-                        let departmentCode = temp[1][0];
+                        let depCode = temp[1][0];
                         let space = temp[1].replace(temp[1][0], '');
-                        switch(departmentCode){
+                        switch(depCode){
                             case '管':
-                                departmentCode = '管理學院';
+                                depCode = '管理學院';
                                 break;
                             case '科':
-                                departmentCode = '科技學院';
+                                depCode = '科技學院';
                                 break;
                             case '人':
-                                departmentCode = '人文學院';
+                                depCode = '人文學院';
                                 break;
                             case '教':
-                                departmentCode = '教育學院';
+                                depCode = '教育學院';
                                 break;
                         }
-                        ref = database.ref('/subscribe/' + user + '/' + departmentCode);
+                        ref = database.ref('/subscribe/' + user + '/' + depCode);
                         ref.once("value").then(function(snapshot) {
                             let subscribeObject = snapshot.val();
                             if(subscribeObject) {
@@ -295,23 +295,23 @@ bot.on('postback', function (event) {
                         });
                         break;
                     case 'unsubscribe':
-                        let departmentCode = temp[1][0];
+                        let depCode = temp[1][0];
                         let space = temp[1].replace(temp[1][0], '');
-                        switch(departmentCode){
+                        switch(depCode){
                             case '管':
-                                departmentCode = '管理學院';
+                                depCode = '管理學院';
                                 break;
                             case '科':
-                                departmentCode = '科技學院';
+                                depCode = '科技學院';
                                 break;
                             case '人':
-                                departmentCode = '人文學院';
+                                depCode = '人文學院';
                                 break;
                             case '教':
-                                departmentCode = '教育學院';
+                                depCode = '教育學院';
                                 break;
                         }
-                        ref = database.ref('/subscribe/' + user + '/' + departmentCode);
+                        ref = database.ref('/subscribe/' + user + '/' + depCode);
                         ref.once("value").then(function(snapshot) {
                             let subscribeObject = snapshot.val();
                             if(subscribeObject) {
@@ -359,20 +359,20 @@ bot.on('postback', function (event) {
                           });
                         break;
                     case 'control':
-                        let departmentCode = temp[1][0];
+                        let depCode = temp[1][0];
                         let space = temp[1].replace(temp[1][0], '');
-                        switch(departmentCode){
+                        switch(depCode){
                             case '管':
-                                departmentCode = '管理學院';
+                                depCode = '管理學院';
                                 break;
                             case '科':
-                                departmentCode = '科技學院';
+                                depCode = '科技學院';
                                 break;
                             case '人':
-                                departmentCode = '人文學院';
+                                depCode = '人文學院';
                                 break;
                             case '教':
-                                departmentCode = '教育學院';
+                                depCode = '教育學院';
                                 break;
                         }
                         break;
