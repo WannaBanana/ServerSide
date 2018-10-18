@@ -206,7 +206,7 @@ bot.on('message', function (event) {
                                 {
                                   "type": "postback",
                                   "label": "確定",
-                                  "data": "unsubscribe"
+                                  "data": "cancelVerify"
                                 }
                               ],
                               "title": "解除帳號綁定",
