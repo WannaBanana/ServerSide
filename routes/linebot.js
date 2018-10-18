@@ -229,7 +229,7 @@ bot.on('message', function (event) {
                 } else if(message.split("user=").length == 2) {
                     let userCode = message.split("user=")[1];
                     ref = database.ref('/user');
-                    ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(search_snapshot) {
+                    ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
                         let userData = snapshot.val();
                         let userKey = undefined;
                         if(userData) {
