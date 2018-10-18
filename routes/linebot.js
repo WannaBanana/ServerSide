@@ -135,8 +135,8 @@ bot.on('message', function (event) {
                                     for(let space in subscribeObject[department]) {
                                         button.push({
                                             "type": "postback",
-                                            "label": department[0] + permissionObject[department][space],
-                                            "data": "unsubscribe&" + department[0] + permissionObject[department][space]
+                                            "label": department[0] + subscribeObject[department][space],
+                                            "data": "unsubscribe&" + department[0] + subscribeObject[department][space]
                                           });
                                     }
                                 }
