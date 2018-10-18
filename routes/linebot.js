@@ -226,7 +226,6 @@ bot.on('message', function (event) {
                         "type": "text",
                         "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
                     });
-                    return;
                 } else if(message.split("user=").length == 2) {
                     let userCode = message.split("user=")[1];
                     ref = database.ref('/user');
@@ -241,23 +240,19 @@ bot.on('message', function (event) {
                                         "text": "使用者: " + userData[key].name + " 綁定成功!"
                                     });
                                 });
-                                return;
                             }
                         } else {
                             event.reply({
                                 "type": "text",
                                 "text": "綁定失敗, 查無此驗證碼: " + userCode
                             });
-                            return;
                         }
                     });
-                    return;
                 } else {
                     event.reply({
                         "type": "text",
                         "text": "尚未綁定使用者"
                     });
-                    return;
                 }
             }
         }
@@ -434,13 +429,11 @@ bot.on('postback', function (event) {
                         });
                 }
             }
-            return;
         } else {
             event.reply({
                 "type": "text",
                 "text": "尚未綁定使用者"
             });
-            return;
         }
     });
 });
