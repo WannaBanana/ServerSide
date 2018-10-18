@@ -85,7 +85,12 @@ bot.on('message', function (event) {
                                   "type": "message",
                                   "label": "管理空間",
                                   "text": "管理空間"
-                                }
+                                },
+                                {
+                                    "type": "message",
+                                    "label": "管理空間",
+                                    "text": "解除連結"
+                                  }
                               ],
                               "title": "指令清單",
                               "text": "請點選下方指令執行動作"
