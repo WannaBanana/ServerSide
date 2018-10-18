@@ -240,6 +240,7 @@ bot.on('message', function (event) {
                                         "text": "使用者: " + userData[key].name + " 綁定成功!"
                                     });
                                 });
+                                break;
                             }
                         } else {
                             event.reply({
