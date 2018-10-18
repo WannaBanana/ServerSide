@@ -319,7 +319,7 @@ bot.on('postback', function (event) {
                                 ref.set(subscribeObject).then(function() {
                                     event.reply({
                                         "type": "text",
-                                        "text": "訂閱成功"
+                                        "text": "取消訂閱成功"
                                     });
                                 })
                             }
