@@ -45,7 +45,8 @@ bot.on('follow',   function (event) {
           "title": "歡迎使用 NCNU Space 服務",
           "text": "請先驗證您的使用者後即可使用服務！"
         }
-    })
+    });
+    return;
 });
 
 bot.on('message', function (event) {
@@ -225,6 +226,7 @@ bot.on('message', function (event) {
                         "type": "text",
                         "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
                     });
+                    return;
                 } else if(message.split("user=").length == 2) {
                     let userCode = message.split("user=")[1];
                     ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
@@ -242,19 +244,23 @@ bot.on('message', function (event) {
                                     "type": "text",
                                     "text": "使用者: " + userData[userKey].name + " 綁定成功!"
                                 });
+                                return;
                             }
                         } else {
                             event.reply({
                                 "type": "text",
                                 "text": "綁定失敗, 查無此驗證碼: " + userCode
                             });
+                            return;
                         }
                     });
+                    return;
                 } else {
                     event.reply({
                         "type": "text",
                         "text": "尚未綁定使用者"
                     });
+                    return;
                 }
             }
         }
@@ -431,11 +437,13 @@ bot.on('postback', function (event) {
                         });
                 }
             }
+            return;
         } else {
             event.reply({
                 "type": "text",
                 "text": "尚未綁定使用者"
             });
+            return;
         }
     });
 });
