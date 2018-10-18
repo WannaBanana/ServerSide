@@ -66,7 +66,7 @@ router.get('/:sid', function(req, res) {
         let userObject = snapshot.val();
         if(!userObject || userObject.hasOwnProperty(sid)) {
             userObject = userObject[sid];
-            res.status(200).send({
+            let sendData = {
                 "photo": userObject.photo,
                 "name": userObject.name,
                 "department": userObject.department,
@@ -75,7 +75,11 @@ router.get('/:sid', function(req, res) {
                 "cellphone": userObject.cellphone,
                 "card": userObject.card,
                 "state": userObject.state
-            });
+            };
+            if(userObject.lineUserID.length == 5) {
+                sendData['lineUserID'] = userObject.lineUserID;
+            }
+            res.status(200).send(sendData);
         } else {
             res.status(404).send({"message": "找不到使用者資料"});
         }
