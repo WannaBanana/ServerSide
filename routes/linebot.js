@@ -229,22 +229,19 @@ bot.on('message', function (event) {
                     return;
                 } else if(message.split("user=").length == 2) {
                     let userCode = message.split("user=")[1];
+                    ref = database.ref('/user');
                     ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
                         let userData = snapshot.val();
-                        let userKey = undefined;
                         if(userData) {
                             for(let key in userData) {
-                                userKey = key;
-                                if(userKey) {
-                                    userData[userKey].lineUserID = event.source.userId;
-                                    ref.child(userKey).set(userData[userKey]).then(function() {
-                                        event.reply({
-                                            "type": "text",
-                                            "text": "使用者: " + userData[userKey].name + " 綁定成功!"
-                                        });
+                                userData[key].lineUserID = event.source.userId;
+                                ref.child(key).set(userData[key]).then(function() {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "使用者: " + userData[key].name + " 綁定成功!"
                                     });
-                                    return;
-                                }
+                                });
+                                return;
                             }
                             event.reply({
                                 "type": "text",
