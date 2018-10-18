@@ -243,11 +243,6 @@ bot.on('message', function (event) {
                                 });
                                 return;
                             }
-                            event.reply({
-                                "type": "text",
-                                "text": "綁定失敗, 查無此驗證碼: " + userCode
-                            });
-                            return;
                         } else {
                             event.reply({
                                 "type": "text",
