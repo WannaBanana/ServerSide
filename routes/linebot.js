@@ -220,13 +220,12 @@ bot.on('message', function (event) {
         } else {
             // 使用者未登記
             if(event.message.type == 'text') {
-                if(message == '帳號驗證') {
+                if(message == '帳號綁定') {
                     event.reply({
                         "type": "text",
                         "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
                     });
-                }
-                if(message.split("user=").length == 2) {
+                } else if(message.split("user=").length == 2) {
                     let userCode = message.split("user=")[1];
                     ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
                         let userData = snapshot.val();
