@@ -168,8 +168,8 @@ bot.on('message', function (event) {
                                     for(let space in permissionObject[department]) {
                                         button.push({
                                             "type": "postback",
-                                            "label": department[0] + space,
-                                            "data": "manage&" + department[0] + space
+                                            "label": department[0] + permissionObject[department][space],
+                                            "data": "manage&" + department[0] + permissionObject[department][space]
                                         });
                                     }
                                 }
