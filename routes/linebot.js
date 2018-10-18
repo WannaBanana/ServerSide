@@ -241,7 +241,7 @@ bot.on('message', function (event) {
                                 });
                                 break;
                             }
-                        } else {
+                        } else if(searchData == undefined) {
                             event.reply({
                                 "type": "text",
                                 "text": "綁定失敗, 查無此驗證碼: " + userCode
