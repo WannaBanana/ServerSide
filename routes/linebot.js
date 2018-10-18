@@ -38,7 +38,7 @@ bot.on('follow',   function (event) {
             {
               "type": "message",
               "label": "立即驗證",
-              "text": "帳號驗證"
+              "text": "帳號綁定"
             }
           ],
           "thumbnailImageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThNUrbkgtLjgyun1P7GEg6wztMMBHmzLs_gCIxs_owciH2jJAo",
@@ -88,7 +88,7 @@ bot.on('message', function (event) {
                                 },
                                 {
                                     "type": "message",
-                                    "label": "管理空間",
+                                    "label": "解除綁定",
                                     "text": "解除連結"
                                   }
                               ],
@@ -184,7 +184,7 @@ bot.on('message', function (event) {
                                     "template": {
                                     "type": "buttons",
                                     "actions": button,
-                                    "title": "新增訂閱",
+                                    "title": "管理空間",
                                     "text": "請點選下列空間進行管理"
                                     }
                                 });
