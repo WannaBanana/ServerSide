@@ -229,8 +229,9 @@ bot.on('message', function (event) {
                 } else if(message.split("user=").length == 2) {
                     let userCode = message.split("user=")[1];
                     ref = database.ref('/user');
-                    ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
-                        let searchData = snapshot.val();
+                    ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(search_snapshot) {
+                        let searchData = search_snapshot.val();
+                        console.log(searchData);
                         if(searchData) {
                             for(let key in searchData) {
                                 ref.child(key).child('lineUserID').set(event.source.userId).then(function() {
