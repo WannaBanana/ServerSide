@@ -259,7 +259,7 @@ bot.on('postback', function (event) {
                 switch(temp[0]) {
                     case 'subscribe':
                         var depCode = temp[1][0];
-                        let space = temp[1].replace(temp[1][0], '');
+                        var space = temp[1].replace(temp[1][0], '');
                         switch(depCode){
                             case '管':
                                 depCode = '管理學院';
@@ -296,7 +296,7 @@ bot.on('postback', function (event) {
                         break;
                     case 'unsubscribe':
                         var depCode = temp[1][0];
-                        let space = temp[1].replace(temp[1][0], '');
+                        var space = temp[1].replace(temp[1][0], '');
                         switch(depCode){
                             case '管':
                                 depCode = '管理學院';
@@ -360,7 +360,7 @@ bot.on('postback', function (event) {
                         break;
                     case 'control':
                         var depCode = temp[1][0];
-                        let space = temp[1].replace(temp[1][0], '');
+                        var space = temp[1].replace(temp[1][0], '');
                         switch(depCode){
                             case '管':
                                 depCode = '管理學院';
