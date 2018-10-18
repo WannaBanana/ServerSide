@@ -196,7 +196,7 @@ bot.on('message', function (event) {
                             }
                         });
                         break;
-                    case '解除連結':
+                    case '解除綁定':
                         event.reply({
                             "type": "template",
                             "altText": "請使用手機接收本訊息",
