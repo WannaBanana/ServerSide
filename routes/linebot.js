@@ -235,18 +235,22 @@ bot.on('message', function (event) {
                         if(userData) {
                             for(let key in userData) {
                                 userKey = key;
-                                break;
-                            }
-                            if(userKey) {
-                                userData[userKey].lineUserID = event.source.userId;
-                                ref.child(userKey).set(userData[userKey]).then(function() {
-                                    event.reply({
-                                        "type": "text",
-                                        "text": "使用者: " + userData[userKey].name + " 綁定成功!"
+                                if(userKey) {
+                                    userData[userKey].lineUserID = event.source.userId;
+                                    ref.child(userKey).set(userData[userKey]).then(function() {
+                                        event.reply({
+                                            "type": "text",
+                                            "text": "使用者: " + userData[userKey].name + " 綁定成功!"
+                                        });
                                     });
-                                });
-                                return;
+                                    return;
+                                }
                             }
+                            event.reply({
+                                "type": "text",
+                                "text": "綁定失敗, 查無此驗證碼: " + userCode
+                            });
+                            return;
                         } else {
                             event.reply({
                                 "type": "text",
