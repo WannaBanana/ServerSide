@@ -239,10 +239,11 @@ bot.on('message', function (event) {
                             }
                             if(userKey) {
                                 userData[userKey].lineUserID = event.source.userId;
-                                ref.child(userKey).set(userData[userKey]);
-                                event.reply({
-                                    "type": "text",
-                                    "text": "使用者: " + userData[userKey].name + " 綁定成功!"
+                                ref.child(userKey).set(userData[userKey]).then(function() {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "使用者: " + userData[userKey].name + " 綁定成功!"
+                                    });
                                 });
                                 return;
                             }
