@@ -230,14 +230,13 @@ bot.on('message', function (event) {
                     let userCode = message.split("user=")[1];
                     ref = database.ref('/user');
                     ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
-                        let userData = snapshot.val();
-                        if(userData) {
-                            for(let key in userData) {
-                                userData[key].lineUserID = event.source.userId;
-                                ref.child(key).set(userData[key]).then(function() {
+                        let searchData = snapshot.val();
+                        if(searchData) {
+                            for(let key in searchData) {
+                                ref.child(key).child('lineUserID').set(event.source.userId).then(function() {
                                     event.reply({
                                         "type": "text",
-                                        "text": "使用者: " + userData[key].name + " 綁定成功!"
+                                        "text": "使用者: " + searchData[key].name + " 綁定成功!"
                                     });
                                 });
                                 break;
