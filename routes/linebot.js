@@ -278,13 +278,20 @@ bot.on('postback', function (event) {
                         ref.once("value").then(function(snapshot) {
                             let subscribeObject = snapshot.val();
                             if(subscribeObject) {
-                                subscribeObject.push(space);
-                                ref.set(subscribeObject).then(function() {
+                                if(subscribeObject.indexOf(space) == -1) {
+                                    subscribeObject.push(space);
+                                    ref.set(subscribeObject).then(function() {
+                                        event.reply({
+                                            "type": "text",
+                                            "text": "訂閱成功"
+                                        });
+                                    });
+                                } else {
                                     event.reply({
                                         "type": "text",
-                                        "text": "訂閱成功"
+                                        "text": "已經訂閱過囉"
                                     });
-                                });
+                                }
                             } else {
                                 ref.set([space]);
                                 event.reply({
