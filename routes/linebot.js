@@ -192,7 +192,22 @@ bot.on('message', function (event) {
                         });
                         break;
                     case '解除連結':
-                        event.reply();
+                        event.reply({
+                            "type": "template",
+                            "altText": "請使用手機接收本訊息",
+                            "template": {
+                              "type": "buttons",
+                              "actions": [
+                                {
+                                  "type": "postback",
+                                  "label": "確定",
+                                  "data": "unsubscribe"
+                                }
+                              ],
+                              "title": "解除帳號綁定",
+                              "text": "您是否確定解除此帳號綁定？（取消請無視本訊息即可）"
+                            }
+                          });
                         break;
                     default:
                 }
