@@ -89,7 +89,7 @@ bot.on('message', function (event) {
                                 {
                                     "type": "message",
                                     "label": "解除綁定",
-                                    "text": "解除連結"
+                                    "text": "解除綁定"
                                   }
                               ],
                               "title": "指令清單",
