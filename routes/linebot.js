@@ -232,11 +232,11 @@ bot.on('message', function (event) {
                         for(let usr in userData) {
                             if(userData[usr].lineUserID == userCode) {
                                 success = true;
-                                userData[userKey].lineUserID = event.source.userId;
-                                ref.child(userKey).set(userData[userKey]).then(() => {
+                                userData[usr].lineUserID = event.source.userId;
+                                ref.child(usr).set(userData[usr]).then(() => {
                                     event.reply({
                                         "type": "text",
-                                        "text": "使用者: " + userData[userKey].name + " 綁定成功!"
+                                        "text": "使用者: " + userData[usr].name + " 綁定成功!"
                                     });
                                 });
                             }
