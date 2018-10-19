@@ -232,8 +232,8 @@ bot.on('message', function (event) {
                         for(let usr in userData) {
                             if(userData[usr].lineUserID == userCode) {
                                 success = true;
-                                userData[usr].lineUserID = event.source.userId;
-                                ref.child(usr).set(userData[usr]).then(() => {
+                                console.log(event.source.userId);
+                                ref.child(usr).child('lineUserID').set(event.source.userId).then(() => {
                                     event.reply({
                                         "type": "text",
                                         "text": "使用者: " + userData[usr].name + " 綁定成功!"
