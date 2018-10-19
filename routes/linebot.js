@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var config = require('../ENV.json');
 var crypto = require('crypto');
 const secret = require('../secret.json');
+
 var database = undefined;
 
 const bot = linebot({
@@ -25,7 +26,7 @@ router.post('/', parser, function (req, res) {
         return res.sendStatus(400);
     }
     bot.parse(req.body);
-    return res.json({});
+    return res.status(200);
 });
 
 bot.on('follow',   function (event) {
@@ -50,19 +51,18 @@ bot.on('follow',   function (event) {
 });
 
 bot.on('message', function (event) {
-    let ref = database.ref('/user');
-    let message = event.message.text;
-    let user = undefined;
-    ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(snapshot) {
-        let userData = snapshot.val();
-        if(userData) {
-            for(let key in userData) {
-                user = key;
-                break;
-            }
-            if(user) {
-                // 使用者已登記
-                if(event.message.type == 'text') {
+    if(event.message.type == 'text') {
+        var ref = database.ref('/user');
+        var message = event.message.text;
+        var user = undefined;
+        ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(searchBindingSnapshot) {
+            var searchBindingData = searchBindingSnapshot.val();
+            if(searchBindingData) {
+                console.log('I find that user');
+                user = Object.keys(searchBindingData)[0];
+                console.log('That user is: ' + user);
+                console.log('Message is: ' + message);
+                if(user) {
                     switch(message) {
                         case '選單':
                             event.reply({
@@ -214,230 +214,218 @@ bot.on('message', function (event) {
                                 }
                               });
                             break;
-                        default:
                     }
                 }
             } else {
-                // 使用者未登記
-                if(event.message.type == 'text') {
-                    if(message == '帳號綁定') {
-                        event.reply({
-                            "type": "text",
-                            "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
-                        });
-                    } else if(message.split("user=").length == 2) {
-                        let userCode = message.split("user=")[1];
-                        ref = database.ref('/user');
-                        ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
-                            let userData = snapshot.val();
-                            let userKey = undefined;
-                            if(userData) {
-                                for(let key in userData) {
-                                    userKey = key;
-                                    break;
-                                }
-                                if(userKey) {
-                                    userData[userKey].lineUserID = event.source.userId;
-                                    ref.child(userKey).set(userData[userKey]);
-                                    event.reply({
-                                        "type": "text",
-                                        "text": "使用者: " + userData[userKey].name + " 綁定成功!"
-                                    });
-                                }
-                            } else {
+                console.log('I can not find that user');
+                if(message == '帳號綁定') {
+                    event.reply({
+                        "type": "text",
+                        "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
+                    });
+                } else if(message.split("user=").length == 2) {
+                    let userCode = message.split("user=")[1];
+                    ref = database.ref('/user');
+                    ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
+                        let userData = snapshot.val();
+                        let userKey = undefined;
+                        if(userData) {
+                            for(let key in userData) {
+                                userKey = key;
+                                break;
+                            }
+                            if(userKey) {
+                                userData[userKey].lineUserID = event.source.userId;
+                                ref.child(userKey).set(userData[userKey]);
                                 event.reply({
                                     "type": "text",
-                                    "text": "綁定失敗, 查無此驗證碼: " + userCode
+                                    "text": "使用者: " + userData[userKey].name + " 綁定成功!"
                                 });
                             }
-                        });
-                    } else {
-                        event.reply({
-                            "type": "text",
-                            "text": "尚未綁定使用者"
-                        });
-                    }
+                        } else {
+                            event.reply({
+                                "type": "text",
+                                "text": "綁定失敗, 查無此驗證碼: " + userCode
+                            });
+                        }
+                    });
+                } else {
+                    event.reply({
+                        "type": "text",
+                        "text": "尚未綁定使用者"
+                    });
                 }
             }
-        }
-    });
+        });
+    }
 });
 
 bot.on('postback', function (event) {
-    let ref = database.ref('/user');
-    let user = undefined;
-    ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(snapshot) {
-        let userData = snapshot.val();
-        if(userData) {
-            for(let key in userData) {
-                user = key;
-                break;
-            }
-        }
-        if(user) {
-            if (event.postback.data) {
-                let temp = event.postback.data.split("&");
-                switch(temp[0]) {
-                    case 'subscribe':
-                        var depCode = temp[1][0];
-                        var space = temp[1].replace(temp[1][0], '');
-                        switch(depCode){
-                            case '管':
-                                depCode = '管理學院';
-                                break;
-                            case '科':
-                                depCode = '科技學院';
-                                break;
-                            case '人':
-                                depCode = '人文學院';
-                                break;
-                            case '教':
-                                depCode = '教育學院';
-                                break;
-                        }
-                        ref = database.ref('/subscribe/' + user + '/' + depCode);
-                        ref.once("value").then(function(snapshot) {
-                            let subscribeObject = snapshot.val();
-                            if(subscribeObject) {
-                                if(subscribeObject.indexOf(space) == -1) {
-                                    subscribeObject.push(space);
-                                    ref.set(subscribeObject).then(function() {
-                                        event.reply({
-                                            "type": "text",
-                                            "text": "訂閱成功"
-                                        });
-                                    });
-                                } else {
+    var ref = database.ref('/user');
+    var temp = event.postback.data.split("&");
+    var user = undefined;
+    ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(searchBindingSnapshot) {
+        var searchBindingData = searchBindingSnapshot.val();
+        if(searchBindingData) {
+            console.log('I find that user');
+            user = Object.keys(searchBindingData)[0];
+            console.log('That user is: ' + user);
+            console.log('Message is: ' + message);
+            switch(temp[0]) {
+                case 'subscribe':
+                    var depCode = temp[1][0];
+                    var space = temp[1].replace(temp[1][0], '');
+                    switch(depCode){
+                        case '管':
+                            depCode = '管理學院';
+                            break;
+                        case '科':
+                            depCode = '科技學院';
+                            break;
+                        case '人':
+                            depCode = '人文學院';
+                            break;
+                        case '教':
+                            depCode = '教育學院';
+                            break;
+                    }
+                    ref = database.ref('/subscribe/' + user + '/' + depCode);
+                    ref.once("value").then(function(snapshot) {
+                        let subscribeObject = snapshot.val();
+                        if(subscribeObject) {
+                            if(subscribeObject.indexOf(space) == -1) {
+                                subscribeObject.push(space);
+                                ref.set(subscribeObject).then(function() {
                                     event.reply({
                                         "type": "text",
-                                        "text": "已經訂閱過該空間了"
+                                        "text": "訂閱成功"
                                     });
-                                }
+                                });
                             } else {
-                                ref.set([space]);
                                 event.reply({
                                     "type": "text",
-                                    "text": "訂閱成功"
+                                    "text": "已經訂閱過該空間了"
                                 });
                             }
-                        });
-                        break;
-                    case 'unsubscribe':
-                        var depCode = temp[1][0];
-                        var space = temp[1].replace(temp[1][0], '');
-                        switch(depCode){
-                            case '管':
-                                depCode = '管理學院';
-                                break;
-                            case '科':
-                                depCode = '科技學院';
-                                break;
-                            case '人':
-                                depCode = '人文學院';
-                                break;
-                            case '教':
-                                depCode = '教育學院';
-                                break;
+                        } else {
+                            ref.set([space]);
+                            event.reply({
+                                "type": "text",
+                                "text": "訂閱成功"
+                            });
                         }
-                        ref = database.ref('/subscribe/' + user + '/' + depCode);
-                        ref.once("value").then(function(snapshot) {
-                            let subscribeObject = snapshot.val();
-                            if(subscribeObject) {
-                                if(subscribeObject.indexOf(space) != -1) {
-                                    subscribeObject.splice(subscribeObject.indexOf(space), 1);
-                                    ref.set(subscribeObject).then(function() {
-                                        event.reply({
-                                            "type": "text",
-                                            "text": "取消訂閱成功"
-                                        });
-                                    })
-                                } else {
+                    });
+                    break;
+                case 'unsubscribe':
+                    var depCode = temp[1][0];
+                    var space = temp[1].replace(temp[1][0], '');
+                    switch(depCode){
+                        case '管':
+                            depCode = '管理學院';
+                            break;
+                        case '科':
+                            depCode = '科技學院';
+                            break;
+                        case '人':
+                            depCode = '人文學院';
+                            break;
+                        case '教':
+                            depCode = '教育學院';
+                            break;
+                    }
+                    ref = database.ref('/subscribe/' + user + '/' + depCode);
+                    ref.once("value").then(function(snapshot) {
+                        let subscribeObject = snapshot.val();
+                        if(subscribeObject) {
+                            if(subscribeObject.indexOf(space) != -1) {
+                                subscribeObject.splice(subscribeObject.indexOf(space), 1);
+                                ref.set(subscribeObject).then(function() {
                                     event.reply({
                                         "type": "text",
-                                        "text": "沒有訂閱該空間"
+                                        "text": "取消訂閱成功"
                                     });
+                                })
+                            } else {
+                                event.reply({
+                                    "type": "text",
+                                    "text": "沒有訂閱該空間"
+                                });
+                            }
+                        }
+                    });
+                    break;
+                case 'manage':
+                    event.reply({
+                        "type": "template",
+                        "altText": "請使用手機接收本訊息",
+                        "template": {
+                            "type": "buttons",
+                            "actions": [
+                                {
+                                    "type": "postback",
+                                    "label": "即時動態",
+                                    "data": "control&" + temp[1] + "&photo"
+                                },
+                                {
+                                    "type": "postback",
+                                    "label": "裝置狀態",
+                                    "data": "control&" + temp[1] + "&state"
+                                },
+                                {
+                                    "type": "postback",
+                                    "label": "開門",
+                                    "data": "control&" + temp[1] + "open"
+                                },
+                                {
+                                    "type": "postback",
+                                    "label": "關門",
+                                    "data": "control&" + temp[1] + "&close"
                                 }
-                            }
-                        });
-                        break;
-                    case 'manage':
-                        event.reply({
-                            "type": "template",
-                            "altText": "請使用手機接收本訊息",
-                            "template": {
-                                "type": "buttons",
-                                "actions": [
-                                    {
-                                        "type": "postback",
-                                        "label": "即時動態",
-                                        "data": "control&" + temp[1] + "&photo"
-                                    },
-                                    {
-                                        "type": "postback",
-                                        "label": "裝置狀態",
-                                        "data": "control&" + temp[1] + "&state"
-                                    },
-                                    {
-                                        "type": "postback",
-                                        "label": "開門",
-                                        "data": "control&" + temp[1] + "open"
-                                    },
-                                    {
-                                        "type": "postback",
-                                        "label": "關門",
-                                        "data": "control&" + temp[1] + "&close"
-                                    }
-                                ],
-                                "title": temp[1] + " 管理選單",
-                                "text": "請選擇下列功能進行管理"
-                            }
-                          });
-                        break;
-                    case 'control':
-                        var depCode = temp[1][0];
-                        var space = temp[1].replace(temp[1][0], '');
-                        switch(depCode){
-                            case '管':
-                                depCode = '管理學院';
-                                break;
-                            case '科':
-                                depCode = '科技學院';
-                                break;
-                            case '人':
-                                depCode = '人文學院';
-                                break;
-                            case '教':
-                                depCode = '教育學院';
-                                break;
+                            ],
+                            "title": temp[1] + " 管理選單",
+                            "text": "請選擇下列功能進行管理"
                         }
-                        break;
-                    case 'cancelVerify':
-                        ref = database.ref('/user/' + user);
-                        ref.once("value").then(function(snapshot) {
-                            let userData = snapshot.val();
-                            if(userData) {
-                                userData.lineUserID = (crypto.createHmac('sha1', secret.salt).update(crypto.createHmac('md5', secret.salt).update((new Date()).toISOString()).digest('hex')).digest('hex')).slice(0, 5);
-                                ref.set(userData).then(function() {
-                                    event.reply({
-                                        "type": "text",
-                                        "text": "解除使用者綁定成功"
-                                    });
+                      });
+                    break;
+                case 'control':
+                    var depCode = temp[1][0];
+                    var space = temp[1].replace(temp[1][0], '');
+                    switch(depCode){
+                        case '管':
+                            depCode = '管理學院';
+                            break;
+                        case '科':
+                            depCode = '科技學院';
+                            break;
+                        case '人':
+                            depCode = '人文學院';
+                            break;
+                        case '教':
+                            depCode = '教育學院';
+                            break;
+                    }
+                    break;
+                case 'cancelVerify':
+                    ref = database.ref('/user/' + user);
+                    ref.once("value").then(function(snapshot) {
+                        let userData = snapshot.val();
+                        if(userData) {
+                            userData.lineUserID = (crypto.createHmac('sha1', secret.salt).update(crypto.createHmac('md5', secret.salt).update((new Date()).toISOString()).digest('hex')).digest('hex')).slice(0, 5);
+                            ref.set(userData).then(function() {
+                                event.reply({
+                                    "type": "text",
+                                    "text": "解除使用者綁定成功"
                                 });
-                            }
-                        });
-                        break;
-                    default:
-                        event.reply({
-                            "type": "text",
-                            "text": "未知的指令"
-                        });
-                }
+                            });
+                        }
+                    });
+                    break;
+                default:
+                    event.reply({
+                        "type": "text",
+                        "text": "未知的指令"
+                    });
             }
-        } else {
-            event.reply({
-                "type": "text",
-                "text": "尚未綁定使用者"
-            });
         }
     });
 });
