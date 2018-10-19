@@ -404,18 +404,12 @@ bot.on('postback', function (event) {
                     }
                     break;
                 case 'cancelVerify':
-                    ref = database.ref('/user/' + user);
-                    ref.once("value").then(function(snapshot) {
-                        let userData = snapshot.val();
-                        if(userData) {
-                            userData.lineUserID = (crypto.createHmac('sha1', secret.salt).update(crypto.createHmac('md5', secret.salt).update((new Date()).toISOString()).digest('hex')).digest('hex')).slice(0, 5);
-                            ref.set(userData).then(function() {
-                                event.reply({
-                                    "type": "text",
-                                    "text": "解除使用者綁定成功"
-                                });
-                            });
-                        }
+                    ref = database.ref('/user');
+                    ref.child(user).child('lineUserID').set((crypto.createHmac('sha1', secret.salt).update(crypto.createHmac('md5', secret.salt).update((new Date()).toISOString()).digest('hex')).digest('hex')).slice(0, 5)).then(()=>{
+                        event.reply({
+                            "type": "text",
+                            "text": "解除使用者綁定成功"
+                        });
                     });
                     break;
                 default:
