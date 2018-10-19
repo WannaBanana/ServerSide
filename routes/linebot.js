@@ -270,7 +270,6 @@ bot.on('postback', function (event) {
             console.log('I find that user');
             user = Object.keys(searchBindingData)[0];
             console.log('That user is: ' + user);
-            console.log('Message is: ' + message);
             switch(temp[0]) {
                 case 'subscribe':
                     var depCode = temp[1][0];
