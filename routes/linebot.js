@@ -60,203 +60,203 @@ bot.on('message', function (event) {
                 user = key;
                 break;
             }
-        }
-        if(user) {
-            // 使用者已登記
-            if(event.message.type == 'text') {
-                switch(message) {
-                    case '選單':
-                        event.reply({
-                            "type": "template",
-                            "altText": "請使用手機接收本訊息",
-                            "template": {
-                              "type": "buttons",
-                              "actions": [
-                                {
-                                  "type": "message",
-                                  "label": "訂閱教室",
-                                  "text": "新增訂閱"
-                                },
-                                {
-                                  "type": "message",
-                                  "label": "取消訂閱",
-                                  "text": "取消訂閱"
-                                },
-                                {
-                                  "type": "message",
-                                  "label": "管理空間",
-                                  "text": "管理空間"
-                                },
-                                {
-                                    "type": "message",
-                                    "label": "解除綁定",
-                                    "text": "解除綁定"
-                                  }
-                              ],
-                              "title": "指令清單",
-                              "text": "請點選下方指令執行動作"
-                            }
-                          });
-                        break;
-                    case '新增訂閱':
-                        ref = database.ref('/permission/' + user);
-                        ref.once("value").then(function(snapshot) {
-                            let permissionObject = snapshot.val();
-                            let button = [];
-                            if(permissionObject) {
-                                for(let department in permissionObject) {
-                                    for(let space in permissionObject[department]) {
-                                        button.push({
-                                            "type": "postback",
-                                            "label": department[0] + permissionObject[department][space],
-                                            "data": "subscribe&" + department[0] + permissionObject[department][space]
-                                          });
-                                    }
-                                }
-                                event.reply({
-                                    "type": "template",
-                                    "altText": "請使用手機接收本訊息",
-                                    "template": {
-                                      "type": "buttons",
-                                      "actions": button,
-                                      "title": "新增訂閱",
-                                      "text": "請點選下列空間進行訂閱"
-                                    }
-                                  });
-                            } else {
-                                event.reply({
-                                    "type": "text",
-                                    "text": "您目前沒有權限訂閱空間！"
-                                });
-                            }
-                        });
-                        break;
-                    case '取消訂閱':
-                        ref = database.ref('/subscribe/' + user);
-                        ref.once("value").then(function(snapshot) {
-                            let subscribeObject = snapshot.val();
-                            let button = [];
-                            if(subscribeObject) {
-                                for(let department in subscribeObject) {
-                                    for(let space in subscribeObject[department]) {
-                                        button.push({
-                                            "type": "postback",
-                                            "label": department[0] + subscribeObject[department][space],
-                                            "data": "unsubscribe&" + department[0] + subscribeObject[department][space]
-                                          });
-                                    }
-                                }
-                                event.reply({
-                                    "type": "template",
-                                    "altText": "請使用手機接收本訊息",
-                                    "template": {
-                                      "type": "buttons",
-                                      "actions": button,
-                                      "title": "解除訂閱",
-                                      "text": "請點選下列空間進行解除訂閱"
-                                    }
-                                  });
-                            } else {
-                                event.reply({
-                                    "type": "text",
-                                    "text": "您目前沒有訂閱的空間！"
-                                });
-                            }
-                        });
-                        break;
-                    case '管理空間':
-                        ref = database.ref('/permission/' + user);
-                        ref.once("value").then(function(snapshot) {
-                            let permissionObject = snapshot.val();
-                            let button = [];
-                            if(permissionObject) {
-                                for(let department in permissionObject) {
-                                    for(let space in permissionObject[department]) {
-                                        button.push({
-                                            "type": "postback",
-                                            "label": department[0] + permissionObject[department][space],
-                                            "data": "manage&" + department[0] + permissionObject[department][space]
-                                        });
-                                    }
-                                }
-                                event.reply({
-                                    "type": "template",
-                                    "altText": "請使用手機接收本訊息",
-                                    "template": {
-                                    "type": "buttons",
-                                    "actions": button,
-                                    "title": "管理空間",
-                                    "text": "請點選下列空間進行管理"
-                                    }
-                                });
-                            } else {
-                                event.reply({
-                                    "type": "text",
-                                    "text": "您目前沒有權限管理空間！"
-                                });
-                            }
-                        });
-                        break;
-                    case '解除綁定':
-                        event.reply({
-                            "type": "template",
-                            "altText": "請使用手機接收本訊息",
-                            "template": {
-                              "type": "buttons",
-                              "actions": [
-                                {
-                                  "type": "postback",
-                                  "label": "確定",
-                                  "data": "cancelVerify"
-                                }
-                              ],
-                              "title": "解除帳號綁定",
-                              "text": "您是否確定解除此帳號綁定？（取消請無視本訊息即可）"
-                            }
-                          });
-                        break;
-                    default:
-                }
-            }
-        } else {
-            // 使用者未登記
-            if(event.message.type == 'text') {
-                if(message == '帳號綁定') {
-                    event.reply({
-                        "type": "text",
-                        "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
-                    });
-                } else if(message.split("user=").length == 2) {
-                    let userCode = message.split("user=")[1];
-                    ref = database.ref('/user');
-                    ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
-                        let userData = snapshot.val();
-                        let userKey = undefined;
-                        if(userData) {
-                            for(let key in userData) {
-                                userKey = key;
-                                break;
-                            }
-                            if(userKey) {
-                                userData[userKey].lineUserID = event.source.userId;
-                                ref.child(userKey).set(userData[userKey]);
-                                event.reply({
-                                    "type": "text",
-                                    "text": "使用者: " + userData[userKey].name + " 綁定成功!"
-                                });
-                            }
-                        } else {
+            if(user) {
+                // 使用者已登記
+                if(event.message.type == 'text') {
+                    switch(message) {
+                        case '選單':
                             event.reply({
-                                "type": "text",
-                                "text": "綁定失敗, 查無此驗證碼: " + userCode
+                                "type": "template",
+                                "altText": "請使用手機接收本訊息",
+                                "template": {
+                                  "type": "buttons",
+                                  "actions": [
+                                    {
+                                      "type": "message",
+                                      "label": "訂閱教室",
+                                      "text": "新增訂閱"
+                                    },
+                                    {
+                                      "type": "message",
+                                      "label": "取消訂閱",
+                                      "text": "取消訂閱"
+                                    },
+                                    {
+                                      "type": "message",
+                                      "label": "管理空間",
+                                      "text": "管理空間"
+                                    },
+                                    {
+                                        "type": "message",
+                                        "label": "解除綁定",
+                                        "text": "解除綁定"
+                                      }
+                                  ],
+                                  "title": "指令清單",
+                                  "text": "請點選下方指令執行動作"
+                                }
+                              });
+                            break;
+                        case '新增訂閱':
+                            ref = database.ref('/permission/' + user);
+                            ref.once("value").then(function(snapshot) {
+                                let permissionObject = snapshot.val();
+                                let button = [];
+                                if(permissionObject) {
+                                    for(let department in permissionObject) {
+                                        for(let space in permissionObject[department]) {
+                                            button.push({
+                                                "type": "postback",
+                                                "label": department[0] + permissionObject[department][space],
+                                                "data": "subscribe&" + department[0] + permissionObject[department][space]
+                                              });
+                                        }
+                                    }
+                                    event.reply({
+                                        "type": "template",
+                                        "altText": "請使用手機接收本訊息",
+                                        "template": {
+                                          "type": "buttons",
+                                          "actions": button,
+                                          "title": "新增訂閱",
+                                          "text": "請點選下列空間進行訂閱"
+                                        }
+                                      });
+                                } else {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "您目前沒有權限訂閱空間！"
+                                    });
+                                }
                             });
-                        }
-                    });
-                } else {
-                    event.reply({
-                        "type": "text",
-                        "text": "尚未綁定使用者"
-                    });
+                            break;
+                        case '取消訂閱':
+                            ref = database.ref('/subscribe/' + user);
+                            ref.once("value").then(function(snapshot) {
+                                let subscribeObject = snapshot.val();
+                                let button = [];
+                                if(subscribeObject) {
+                                    for(let department in subscribeObject) {
+                                        for(let space in subscribeObject[department]) {
+                                            button.push({
+                                                "type": "postback",
+                                                "label": department[0] + subscribeObject[department][space],
+                                                "data": "unsubscribe&" + department[0] + subscribeObject[department][space]
+                                              });
+                                        }
+                                    }
+                                    event.reply({
+                                        "type": "template",
+                                        "altText": "請使用手機接收本訊息",
+                                        "template": {
+                                          "type": "buttons",
+                                          "actions": button,
+                                          "title": "解除訂閱",
+                                          "text": "請點選下列空間進行解除訂閱"
+                                        }
+                                      });
+                                } else {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "您目前沒有訂閱的空間！"
+                                    });
+                                }
+                            });
+                            break;
+                        case '管理空間':
+                            ref = database.ref('/permission/' + user);
+                            ref.once("value").then(function(snapshot) {
+                                let permissionObject = snapshot.val();
+                                let button = [];
+                                if(permissionObject) {
+                                    for(let department in permissionObject) {
+                                        for(let space in permissionObject[department]) {
+                                            button.push({
+                                                "type": "postback",
+                                                "label": department[0] + permissionObject[department][space],
+                                                "data": "manage&" + department[0] + permissionObject[department][space]
+                                            });
+                                        }
+                                    }
+                                    event.reply({
+                                        "type": "template",
+                                        "altText": "請使用手機接收本訊息",
+                                        "template": {
+                                        "type": "buttons",
+                                        "actions": button,
+                                        "title": "管理空間",
+                                        "text": "請點選下列空間進行管理"
+                                        }
+                                    });
+                                } else {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "您目前沒有權限管理空間！"
+                                    });
+                                }
+                            });
+                            break;
+                        case '解除綁定':
+                            event.reply({
+                                "type": "template",
+                                "altText": "請使用手機接收本訊息",
+                                "template": {
+                                  "type": "buttons",
+                                  "actions": [
+                                    {
+                                      "type": "postback",
+                                      "label": "確定",
+                                      "data": "cancelVerify"
+                                    }
+                                  ],
+                                  "title": "解除帳號綁定",
+                                  "text": "您是否確定解除此帳號綁定？（取消請無視本訊息即可）"
+                                }
+                              });
+                            break;
+                        default:
+                    }
+                }
+            } else {
+                // 使用者未登記
+                if(event.message.type == 'text') {
+                    if(message == '帳號綁定') {
+                        event.reply({
+                            "type": "text",
+                            "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
+                        });
+                    } else if(message.split("user=").length == 2) {
+                        let userCode = message.split("user=")[1];
+                        ref = database.ref('/user');
+                        ref.orderByChild('lineUserID').equalTo(userCode).on("value", function(snapshot) {
+                            let userData = snapshot.val();
+                            let userKey = undefined;
+                            if(userData) {
+                                for(let key in userData) {
+                                    userKey = key;
+                                    break;
+                                }
+                                if(userKey) {
+                                    userData[userKey].lineUserID = event.source.userId;
+                                    ref.child(userKey).set(userData[userKey]);
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "使用者: " + userData[userKey].name + " 綁定成功!"
+                                    });
+                                }
+                            } else {
+                                event.reply({
+                                    "type": "text",
+                                    "text": "綁定失敗, 查無此驗證碼: " + userCode
+                                });
+                            }
+                        });
+                    } else {
+                        event.reply({
+                            "type": "text",
+                            "text": "尚未綁定使用者"
+                        });
+                    }
                 }
             }
         }
