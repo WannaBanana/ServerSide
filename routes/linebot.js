@@ -405,7 +405,7 @@ bot.on('postback', function (event) {
                     break;
                 case 'cancelVerify':
                     ref = database.ref('/user');
-                    ref.child(user).child('lineUserID').set((crypto.createHmac('sha1', secret.salt).update(crypto.createHmac('md5', secret.salt).update((new Date()).toISOString()).digest('hex')).digest('hex')).slice(0, 5)).then(()=>{
+                    ref.child(user).child('lineUserID').set('12345').then(()=>{
                         event.reply({
                             "type": "text",
                             "text": "解除使用者綁定成功"
