@@ -228,7 +228,6 @@ bot.on('message', function (event) {
                     ref = database.ref('/user');
                     ref.once("value").then(function(snapshot) {
                         let userData = snapshot.val();
-                        let success = false;
                         for(let usr in userData) {
                             if(userData[usr].lineUserID == userCode) {
                                 success = true;
@@ -240,13 +239,11 @@ bot.on('message', function (event) {
                                     });
                                 });
                             }
-                            if(success = false) {
-                                event.reply({
-                                    "type": "text",
-                                    "text": "綁定失敗, 查無此驗證碼: " + userCode
-                                });
-                            }
                         }
+                        event.reply({
+                            "type": "text",
+                            "text": "綁定失敗, 查無此驗證碼: " + userCode
+                        });
                     });
                 } else {
                     event.reply({
