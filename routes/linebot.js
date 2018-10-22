@@ -20,6 +20,46 @@ const parser = bodyParser.json({
     }
 });
 
+router.post('/notify', parser, function (req, res) {
+    database = req.database
+    let requestObject = JSON.parse(JSON.stringify(req.body));
+    let department = requestObject.department;
+    let space = requestObject.space;
+    let message = requestObject.message;
+    let ref = database.ref('/subscribe');
+    let promises = [];
+    let userGroup = [];
+    ref.once("value").then(function(snapshot) {
+        let subscribeObject = snapshot.val();
+        if(subscribeObject) {
+            for(let user in subscribeObject) {
+                for(let dep in subscribeObject[user]) {
+                    if(dep == department) {
+                        for(let spc in subscribeObject[user][department]) {
+                            if(spc == space) {
+                                ref = database.ref('/user/' + uesr + '/' + lineUserID);
+                                promises.push(new Promise((resolve, reject) => {
+                                    ref.once("value").then(function(lineData) {
+                                        let lineID = lineData.val();
+                                        if(lineID && lineID.length != 5) {
+                                            userGroup.push(lineID);
+                                            resolve();
+                                        }
+                                    });
+                                }));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Promise.all(promises).then(()=>{
+            bot.multicast(userGroup, message);
+        });
+    });
+});
+
+
 router.post('/', parser, function (req, res) {
     database = req.database
     if (!bot.verify(req.rawBody, req.get('X-Line-Signature'))) {
