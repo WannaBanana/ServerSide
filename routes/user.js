@@ -97,7 +97,7 @@ router.post('/:sid', function(req, res) {
         let userObject = snapshot.val();
         if(!userObject || userObject.hasOwnProperty(sid)) {
             userObject = userObject[sid];
-            if(crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex') == crypto.createHmac('sha256', secret.salt).update(password).digest('hex')) {
+            if(crypto.createHmac('sha256', secret.salt).update(userObject.password).digest('hex') == crypto.createHmac('sha256', secret.salt).update(password).digest('hex')) {
                 res.status(200).send({"status": true});
             }
             res.status(401).send({"status": false});
