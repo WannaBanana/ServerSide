@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+var crypto = require('crypto');
+const secret = require('../secret.json');
 
 /* 取得驗證及非驗證使用者資料 */
 router.get('/verify', function(req, res) {
@@ -82,6 +84,25 @@ router.get('/:sid', function(req, res) {
             res.status(200).send(sendData);
         } else {
             res.status(404).send({"message": "找不到使用者資料"});
+        }
+    });
+});
+
+/* 驗證使用者密碼 */
+router.post('/:sid', function(req, res) {
+    let sid = req.params.sid;
+    let password = JSON.parse(JSON.stringify(req.body)).password;
+    ref = req.database.ref('/user');
+    ref.once("value").then(function(snapshot) {
+        let userObject = snapshot.val();
+        if(!userObject || userObject.hasOwnProperty(sid)) {
+            userObject = userObject[sid];
+            if(crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex') == crypto.createHmac('sha256', secret.salt).update(password).digest('hex')) {
+                res.status(200).send({"status": true});
+            }
+            res.status(401).send({"status": false});
+        } else {
+            res.status(404).send({"status": false});
         }
     });
 });
