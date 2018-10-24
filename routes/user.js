@@ -93,7 +93,7 @@ router.post('/:sid', function(req, res) {
     let sid = req.params.sid;
     let password = JSON.parse(JSON.stringify(req.body)).password;
     ref = req.database.ref('/user');
-    ref.once("value").then(function(snapshot) {
+    ref.orderByChild('state').equalTo('已驗證').on("value", function(snapshot) {
         let userObject = snapshot.val();
         if(!userObject || userObject.hasOwnProperty(sid)) {
             userObject = userObject[sid];
