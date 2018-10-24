@@ -123,13 +123,13 @@ router.patch('/:sid', function(req, res) {
             ref = req.database.ref('/user/' + sid);
             ref.once('value').then(function(student_snapshot) {
                 let studentObject = student_snapshot.val();
-                if(studentObject.password == crypto.createHmac('sha256').update(requestObject.password).digest('hex')) {
+                if(studentObject.password == crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex')) {
                     for(let key in verify_fields) {
                         if(requestObject.hasOwnProperty(verify_fields[key])) {
                             studentObject[verify_fields[key]] = requestObject[verify_fields[key]];
                         }
                         if(requestObject.hasOwnProperty('newpassword')) {
-                            studentObject['password'] = crypto.createHmac('sha256').update(requestObject.newpassword).digest('hex');
+                            studentObject['password'] = crypto.createHmac('sha256', secret.salt).update(requestObject.newpassword).digest('hex');
                         }
                     }
                     ref.set(studentObject);
@@ -210,7 +210,7 @@ router.delete('/:sid', function(req, res) {
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
         if(userObject || userObject.hasOwnProperty(sid)) {
-            if(userObject[sid].password == hash.sha256().update(requestObject.password).digest('hex')) {
+            if(userObject[sid].password == crypto.createHmac('sha256', secret.salt).update(requestObject.newpassword).digest('hex')) {
                 delete userObject[sid];
                 ref.set(userObject);
                 res.status(200).send({"message": "刪除成功"});
