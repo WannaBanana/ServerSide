@@ -88,14 +88,9 @@ if (app.get('env') === 'development') {
         console.log(err);
         res.status(err.status || 500);
         res.render('error', {
-            message: "猴子找不到頁面",
-        });
-        /*
-        res.render('error', {
             message: err.message,
             error: err
         });
-        */
     });
 }
 
@@ -105,14 +100,9 @@ app.use(function(err, req, res, next) {
     console.log(err);
     res.status(err.status || 500);
     res.render('error', {
-        message: "猴子找不到頁面"
-    });
-    /*
-    res.render('error', {
         message: err.message,
         error: {}
     });
-    */
 });
 
 var httpServer = http.createServer(function (req, res) {
