@@ -88,8 +88,7 @@ if (app.get('env') === 'development') {
         console.log(err);
         res.status(err.status || 500);
         res.render('error', {
-            message: "猴子找不到問題",
-            error: "請稍後再試"
+            message: "猴子找不到頁面",
         });
         /*
         res.render('error', {
@@ -106,8 +105,7 @@ app.use(function(err, req, res, next) {
     console.log(err);
     res.status(err.status || 500);
     res.render('error', {
-        message: "猴子找不到問題",
-        error: "請稍後再試"
+        message: "猴子找不到頁面"
     });
     /*
     res.render('error', {
