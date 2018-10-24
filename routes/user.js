@@ -99,8 +99,9 @@ router.post('/:sid', function(req, res) {
             userObject = userObject[sid];
             if(userObject.password == crypto.createHmac('sha256', secret.salt).update(password).digest('hex')) {
                 res.status(200).send({"status": true});
+            } else {
+                res.status(401).send({"status": false});
             }
-            res.status(401).send({"status": false});
         } else {
             res.status(404).send({"status": false});
         }
