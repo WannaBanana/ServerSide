@@ -90,7 +90,7 @@ if (app.get('env') === 'development') {
         res.render('error', {
             message: "猴子找不到問題",
             error: "請稍後再試"
-        }
+        });
         /*
         res.render('error', {
             message: err.message,
@@ -108,7 +108,7 @@ app.use(function(err, req, res, next) {
     res.render('error', {
         message: "猴子找不到問題",
         error: "請稍後再試"
-    }
+    });
     /*
     res.render('error', {
         message: err.message,
