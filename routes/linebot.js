@@ -7,7 +7,6 @@ var crypto = require('crypto');
 const secret = require('../secret.json');
 
 var database = undefined;
-var waitingStack = [];
 
 const bot = linebot({
     channelId: config.line_channelID,
@@ -86,11 +85,6 @@ bot.on('follow',   function (event) {
 });
 
 bot.on('message', function (event) {
-    if(waitingStack.indexOf(event.source.userId) != -1) {
-        return;
-    } else {
-        waitingStack.push(event.source.userId);
-    }
     if(event.message.type == 'text') {
         var ref = database.ref('/user');
         var message = event.message.text;
@@ -136,7 +130,6 @@ bot.on('message', function (event) {
                                   "text": "請點選下方指令執行動作"
                                 }
                             });
-                            waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                             break;
                         case '新增訂閱':
                             ref = database.ref('/permission/' + user);
@@ -163,13 +156,11 @@ bot.on('message', function (event) {
                                           "text": "請點選下列空間進行訂閱"
                                         }
                                     });
-                                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                                 } else {
                                     event.reply({
                                         "type": "text",
                                         "text": "您目前沒有權限訂閱空間！"
                                     });
-                                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                                 }
                             });
                             break;
@@ -198,13 +189,11 @@ bot.on('message', function (event) {
                                           "text": "請點選下列空間進行解除訂閱"
                                         }
                                     });
-                                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                                 } else {
                                     event.reply({
                                         "type": "text",
                                         "text": "您目前沒有訂閱的空間！"
                                     });
-                                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                                 }
                             });
                             break;
@@ -233,13 +222,11 @@ bot.on('message', function (event) {
                                         "text": "請點選下列空間進行管理"
                                         }
                                     });
-                                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                                 } else {
                                     event.reply({
                                         "type": "text",
                                         "text": "您目前沒有權限管理空間！"
                                     });
-                                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                                 }
                             });
                             break;
@@ -260,7 +247,6 @@ bot.on('message', function (event) {
                                   "text": "您是否確定解除此帳號綁定？（取消請無視本訊息即可）"
                                 }
                             });
-                            waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                             break;
                     }
                 }
@@ -271,7 +257,6 @@ bot.on('message', function (event) {
                         "type": "text",
                         "text": "請輸入： “user=您的驗證碼” 來綁定使用者"
                     });
-                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                 } else if(message.split("user=").length == 2) {
                     let userCode = message.split("user=")[1];
                     ref = database.ref('/user');
@@ -287,7 +272,6 @@ bot.on('message', function (event) {
                                         "type": "text",
                                         "text": "使用者: " + userData[usr].name + " 綁定成功!"
                                     });
-                                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                                 });
                             }
                         }
@@ -296,7 +280,6 @@ bot.on('message', function (event) {
                                 "type": "text",
                                 "text": "綁定失敗, 查無此驗證碼: " + userCode
                             });
-                            waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                         }
                     });
                 } else {
@@ -304,21 +287,13 @@ bot.on('message', function (event) {
                         "type": "text",
                         "text": "尚未綁定使用者"
                     });
-                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                 }
             }
         });
-    } else {
-        waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
     }
 });
 
 bot.on('postback', function (event) {
-    if(waitingStack.indexOf(event.source.userId) != -1) {
-        return;
-    } else {
-        waitingStack.push(event.source.userId);
-    }
     var ref = database.ref('/user');
     var temp = event.postback.data.split("&");
     var user = undefined;
@@ -357,14 +332,12 @@ bot.on('postback', function (event) {
                                         "type": "text",
                                         "text": "訂閱成功"
                                     });
-                                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                                 });
                             } else {
                                 event.reply({
                                     "type": "text",
                                     "text": "已經訂閱過該空間了"
                                 });
-                                waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                             }
                         } else {
                             ref.set([space]);
@@ -372,7 +345,6 @@ bot.on('postback', function (event) {
                                 "type": "text",
                                 "text": "訂閱成功"
                             });
-                            waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                         }
                     });
                     break;
@@ -404,14 +376,12 @@ bot.on('postback', function (event) {
                                         "type": "text",
                                         "text": "取消訂閱成功"
                                     });
-                                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                                 })
                             } else {
                                 event.reply({
                                     "type": "text",
                                     "text": "沒有訂閱該空間"
                                 });
-                                waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                             }
                         }
                     });
@@ -448,7 +418,6 @@ bot.on('postback', function (event) {
                             "text": "請選擇下列功能進行管理"
                         }
                     });
-                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                     break;
                 case 'control':
                     var depCode = temp[1][0];
@@ -476,17 +445,13 @@ bot.on('postback', function (event) {
                             "text": "解除使用者綁定成功"
                         });
                     });
-                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
                     break;
                 default:
                     event.reply({
                         "type": "text",
                         "text": "未知的指令"
                     });
-                    waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
             }
-        } else {
-            waitingStack.splice(waitingStack.indexOf(event.source.userId), 1);
         }
     });
 });
