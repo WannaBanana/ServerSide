@@ -14,13 +14,7 @@ const bot = linebot({
     channelAccessToken: config.line_accessToken
 });
 
-const parser = bodyParser.json({
-    verify: function (req, res, buf, encoding) {
-        req.rawBody = buf.toString(encoding);
-    }
-});
-
-router.post('/notify', parser, function (req, res) {
+router.post('/notify', function (req, res) {
     database = req.database
     let requestObject = JSON.parse(JSON.stringify(req.body));
     let department = requestObject.department;
@@ -60,7 +54,7 @@ router.post('/notify', parser, function (req, res) {
 });
 
 
-router.post('/', parser, function (req, res) {
+router.post('/', function (req, res) {
     database = req.database
     if (!bot.verify(req.rawBody, req.get('X-Line-Signature'))) {
         return res.sendStatus(400);
