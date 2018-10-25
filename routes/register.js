@@ -127,6 +127,8 @@ router.patch('/:sid', function(req, res) {
             ref = req.database.ref('/user/' + sid);
             ref.once('value').then(function(student_snapshot) {
                 let studentObject = student_snapshot.val();
+                console.log(studentObject.password);
+                console.log(crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex'));
                 if(studentObject.password == crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex')) {
                     for(let key in verify_fields) {
                         if(requestObject.hasOwnProperty(verify_fields[key])) {
