@@ -117,8 +117,9 @@ router.patch('/:sid', function(req, res) {
     let requestObject = JSON.parse(JSON.stringify(req.body));
     ref = req.database.ref('/user');
     let verify_fields = ["photo", "name", "email", "cellphone"];
-    if(requestObject.password) {
+    if(!requestObject.password) {
         res.status(401).send({"message": "沒有填寫密碼欄位"});
+        return
     }
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
