@@ -7,6 +7,7 @@ var crypto = require('crypto');
 const secret = require('../secret.json');
 
 var database = undefined;
+var waitingStack = [];
 
 const bot = linebot({
     channelId: config.line_channelID,
@@ -85,6 +86,11 @@ bot.on('follow',   function (event) {
 });
 
 bot.on('message', function (event) {
+    if(waitingStack.indexOf(fruits.indexOf) != -1) {
+        return;
+    } else {
+        waitingStack.push(event.source.userId);
+    }
     if(event.message.type == 'text') {
         var ref = database.ref('/user');
         var message = event.message.text;
