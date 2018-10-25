@@ -114,7 +114,7 @@ router.post('/', function(req, res) {
 /* 修改帳號資料 */
 router.patch('/:sid', function(req, res) {
     let sid = req.params.sid;
-    let requestObject = JSON.parse(JSON.stringify(req.body));
+    let requestObject = req.body;
     ref = req.database.ref('/user');
     let verify_fields = ["photo", "name", "email", "cellphone"];
     if(!requestObject.password) {
