@@ -238,14 +238,23 @@ bot.on('message', function (event) {
                                   "type": "buttons",
                                   "actions": [
                                     {
-                                      "type": "postback",
-                                      "label": "確定",
-                                      "data": "cancelVerify"
+                                      "type": "message",
+                                      "label": "確定解除綁定",
+                                      "text": "確定解除綁定"
                                     }
                                   ],
                                   "title": "解除帳號綁定",
                                   "text": "您是否確定解除此帳號綁定？（取消請無視本訊息即可）"
                                 }
+                              });
+                            break;
+                        case '確定解除綁定':
+                            ref = database.ref('/user');
+                            ref.child(user).child('lineUserID').set((crypto.createHmac('sha1', secret.salt).update(crypto.createHmac('md5', secret.salt).update((new Date()).toISOString()).digest('hex')).digest('hex')).slice(0, 5)).then(()=>{
+                                event.reply({
+                                    "type": "text",
+                                    "text": "解除使用者綁定成功"
+                                });
                             });
                             break;
                     }
@@ -436,15 +445,6 @@ bot.on('postback', function (event) {
                             depCode = '教育學院';
                             break;
                     }
-                    break;
-                case 'cancelVerify':
-                    ref = database.ref('/user');
-                    ref.child(user).child('lineUserID').set((crypto.createHmac('sha1', secret.salt).update(crypto.createHmac('md5', secret.salt).update((new Date()).toISOString()).digest('hex')).digest('hex')).slice(0, 5)).then(()=>{
-                        event.reply({
-                            "type": "text",
-                            "text": "解除使用者綁定成功"
-                        });
-                    });
                     break;
                 default:
                     event.reply({
