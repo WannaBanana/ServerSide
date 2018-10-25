@@ -88,7 +88,7 @@ router.post('/', function(req, res) {
         ref = req.database.ref('/user');
         ref.once('value').then(function(snapshot) {
             let userObject = snapshot.val();
-            if(!userObject || !userObject.hasOwnProperty(requestObject.student_id)) {
+            if(!userObject || !(userObject.hasOwnProperty(requestObject.student_id))) {
                 ref = req.database.ref('/user/' + requestObject.student_id);
                 ref.set({
                     "photo": requestObject.photo,
