@@ -9,7 +9,7 @@ router.get('/:sid', function(req, res) {
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject && userObject.hasOwnProperty(sid)) {
+        if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
             res.status(200).send(true);
         } else {
             res.status(406).send(false);
@@ -24,7 +24,7 @@ router.post('/:sid', function(req, res) {
     let verify_fields = ["cardName", "cardID"];
     let lack_fields = [];
     for(let key in verify_fields) {
-        if(!requestObject.hasOwnProperty(verify_fields[key])) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
             lack_fields.push(verify_fields[key]);
         }
     }
@@ -32,7 +32,7 @@ router.post('/:sid', function(req, res) {
         ref = req.database.ref('/user');
         ref.once('value').then(function(snapshot) {
             let userObject = snapshot.val();
-            if(userObject && userObject.hasOwnProperty(sid)) {
+            if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
                 ref = req.database.ref('/user/' + sid + '/card');
                 ref.once('value').then(function(card_snapshot) {
                     if(card_snapshot.exists()) {
@@ -76,7 +76,7 @@ router.post('/', function(req, res) {
     let verify_fields = ["photo", "first_name", "last_name", "email", "password", "student_id", "cellphone"];
     let lack_fields = [];
     for(let key in verify_fields) {
-        if(!requestObject.hasOwnProperty(verify_fields[key])) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
             lack_fields.push(verify_fields[key]);
         }
     }
@@ -88,7 +88,7 @@ router.post('/', function(req, res) {
         ref = req.database.ref('/user');
         ref.once('value').then(function(snapshot) {
             let userObject = snapshot.val();
-            if(!userObject || !(userObject.hasOwnProperty(requestObject.student_id))) {
+            if(!userObject || !(Object.prototype.hasOwnProperty.call(userObject, requestObject.student_id))) {
                 ref = req.database.ref('/user/' + requestObject.student_id);
                 ref.set({
                     "photo": requestObject.photo,
@@ -125,7 +125,7 @@ router.patch('/:sid', function(req, res) {
     }
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject && userObject.hasOwnProperty(sid)) {
+        if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
             ref = req.database.ref('/user/' + sid);
             ref.once('value').then(function(student_snapshot) {
                 let studentObject = student_snapshot.val();
@@ -133,10 +133,10 @@ router.patch('/:sid', function(req, res) {
                 console.log(crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex'));
                 if(studentObject.password == crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex')) {
                     for(let key in verify_fields) {
-                        if(requestObject.hasOwnProperty(verify_fields[key])) {
+                        if(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key])) {
                             studentObject[verify_fields[key]] = requestObject[verify_fields[key]];
                         }
-                        if(requestObject.hasOwnProperty('newpassword')) {
+                        if(Object.prototype.hasOwnProperty.call(requestObject, 'newpassword')) {
                             studentObject['password'] = crypto.createHmac('sha256', secret.salt).update(requestObject.newpassword).digest('hex');
                         }
                     }
@@ -158,7 +158,7 @@ router.patch('/verify/:sid', function(req, res) {
     ref = req.database.ref('/user');
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject && userObject.hasOwnProperty(sid)) {
+        if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
             ref = req.database.ref('/user/' + sid);
             ref.once('value').then(function(student_snapshot) {
                 let studentObject = student_snapshot.val();
@@ -181,7 +181,7 @@ router.delete('/:sid/card/:cardID', function(req, res) {
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject && userObject.hasOwnProperty(sid)) {
+        if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
             ref = req.database.ref('/user/' + sid + '/card');
             ref.once('value').then(function(card_snapshot) {
                 if(card_snapshot.exists()) {
@@ -217,7 +217,7 @@ router.delete('/:sid', function(req, res) {
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject && userObject.hasOwnProperty(sid)) {
+        if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
             if(userObject[sid].password == crypto.createHmac('sha256', secret.salt).update(requestObject.newpassword).digest('hex')) {
                 delete userObject[sid];
                 ref.set(userObject);
