@@ -32,21 +32,19 @@ router.post('/notify', function (req, res) {
                 for(let dep in subscribeObject[user]) {
                     if(dep == department) {
                         console.log(department);
-                        for(let spc in subscribeObject[user][department]) {
-                            if(spc == space) {
-                                console.log(space);
-                                ref = database.ref('/user/' + uesr + '/' + lineUserID);
-                                promises.push(new Promise((resolve, reject) => {
-                                    ref.once("value").then(function(lineData) {
-                                        let lineID = lineData.val();
-                                        if(lineID && lineID.length != 5) {
-                                            console.log(lineID);
-                                            userGroup.push(lineID);
-                                            resolve();
-                                        }
-                                    });
-                                }));
-                            }
+                        if(subscribeObject[user][department].indexOf(space) != -1) {
+                            console.log(space);
+                            ref = database.ref('/user/' + uesr + '/' + lineUserID);
+                            promises.push(new Promise((resolve, reject) => {
+                                ref.once("value").then(function(lineData) {
+                                    let lineID = lineData.val();
+                                    if(lineID && lineID.length != 5) {
+                                        console.log(lineID);
+                                        userGroup.push(lineID);
+                                        resolve();
+                                    }
+                                });
+                            }));
                         }
                     }
                 }
