@@ -94,7 +94,7 @@ bot.on('message', function (event) {
         var ref = database.ref('/user');
         var message = event.message.text;
         var user = undefined;
-        ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(searchBindingSnapshot) {
+        ref.orderByChild('lineUserID').equalTo(event.source.userId).once("value", function(searchBindingSnapshot) {
             var searchBindingData = searchBindingSnapshot.val();
             if(searchBindingData) {
                 console.log('I find that user');
@@ -311,7 +311,7 @@ bot.on('postback', function (event) {
     var ref = database.ref('/user');
     var temp = event.postback.data.split("&");
     var user = undefined;
-    ref.orderByChild('lineUserID').equalTo(event.source.userId).on("value", function(searchBindingSnapshot) {
+    ref.orderByChild('lineUserID').equalTo(event.source.userId).once("value", function(searchBindingSnapshot) {
         var searchBindingData = searchBindingSnapshot.val();
         if(searchBindingData) {
             console.log('I find that user');
