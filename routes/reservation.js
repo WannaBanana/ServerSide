@@ -9,11 +9,11 @@ router.get('/:department/:space/:key', function(req, res) {
     ref = req.database.ref('/reservation');
     ref.once("value").then(function(snapshot) {
         let reservationObject = snapshot.val();
-        if(reservationObject.hasOwnProperty(department)) {
+        if(Object.prototype.hasOwnProperty.call(reservationObject, department)) {
             ref = req.database.ref('/reservation/' + department);
             ref.once("value").then(function(department_snapshot) {
                 let departmentObject = department_snapshot.val();
-                if(departmentObject.hasOwnProperty(space)) {
+                if(Object.prototype.hasOwnProperty.call(departmentObject, space)) {
                     for(let date in space) {
                         for(let self_key in date) {
                             if(self_key == key) {
@@ -39,11 +39,11 @@ router.get('/:department/:space', function(req, res) {
     ref = req.database.ref('/reservation');
     ref.once("value").then(function(snapshot) {
         let reservationObject = snapshot.val();
-        if(reservationObject.hasOwnProperty(department)) {
+        if(Object.prototype.hasOwnProperty.call(reservationObject, department)) {
             ref = req.database.ref('/reservation/' + department);
             ref.once("value").then(function(department_snapshot) {
                 let departmentObject = department_snapshot.val();
-                if(departmentObject.hasOwnProperty(space)) {
+                if(Object.prototype.hasOwnProperty.call(departmentObject, space)) {
                     res.status(200).send(departmentObject[space]);
                 } else {
                     res.status(404).send('找不到該空間資料');
@@ -60,7 +60,7 @@ router.get('/:department', function(req, res) {
     ref = req.database.ref('/reservation');
     ref.once("value").then(function(snapshot) {
         let reservationObject = snapshot.val();
-        if(reservationObject.hasOwnProperty(department)) {
+        if(Object.prototype.hasOwnProperty.call(reservationObject, department)) {
             res.status(200).send(reservationObject[department]);
         } else {
             res.status(404).send('找不到該院別資料');
@@ -84,7 +84,7 @@ router.post('/admin/:department/:space', function(req, res) {
     let verify_fields = ["name", "phone", "title", "type", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
     for(let key in verify_fields) {
-        if(!requestObject.hasOwnProperty(verify_fields[key])) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
             lack_fields.push(verify_fields[key]);
         }
     }
@@ -283,7 +283,7 @@ router.post('/:department/:space', function(req, res) {
     let verify_fields = ["name", "phone", "title", "type", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
     for(let key in verify_fields) {
-        if(!requestObject.hasOwnProperty(verify_fields[key])) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
             lack_fields.push(verify_fields[key]);
         }
     }
@@ -484,7 +484,7 @@ router.patch('/:department/:space/:key', function(req, res) {
     let verify_fields = ["title", "type", "start", "end"];
     let lack_fields = [];
     for(let key in verify_fields) {
-        if(!requestObject.hasOwnProperty(verify_fields[key])) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
             lack_fields.push(verify_fields[key]);
         }
     }
@@ -574,7 +574,7 @@ router.delete('/:department/:space/:key', function(req, res) {
     let verify_fields = ["deleteRepeat"];
     let lack_fields = [];
     for(let key in verify_fields) {
-        if(!requestObject.hasOwnProperty(verify_fields[key])) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
             lack_fields.push(verify_fields[key]);
         }
     }
@@ -589,7 +589,7 @@ router.delete('/:department/:space/:key', function(req, res) {
                     if(self_key == key) {
                         find = true;
                         ref.child(date).child(self_key).remove();
-                        if(spaceReservation[date][self_key].hasOwnProperty('child')) {
+                        if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
                             childID = spaceReservation[date][self_key]['child'];
                         }
                     }
@@ -607,7 +607,7 @@ router.delete('/:department/:space/:key', function(req, res) {
                         for(let self_key in spaceReservation[date]) {
                             if(self_key == childID) {
                                 ref.child(date).child(self_key).remove();
-                                if(spaceReservation[date][self_key].hasOwnProperty('child')) {
+                                if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
                                     childID = spaceReservation[date][self_key]['child'];
                                 } else {
                                     childID = undefined;
