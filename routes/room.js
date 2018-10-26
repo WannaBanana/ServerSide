@@ -8,11 +8,11 @@ router.get('/:department/:space', function(req, res) {
     ref = req.database.ref('/space');
     ref.once("value").then(function(snapshot) {
         let spaceObject = snapshot.val();
-        if(spaceObject.hasOwnProperty(department)) {
+        if(Object.prototype.hasOwnProperty.call(spaceObject, department)) {
             ref = req.database.ref('/space/' + department);
             ref.once("value").then(function(department_snapshot) {
                 let departmentObject = department_snapshot.val();
-                if(departmentObject.hasOwnProperty(space)) {
+                if(Object.prototype.hasOwnProperty.call(departmentObject, space)) {
                     res.status(200).send(departmentObject[space]);
                 } else {
                     res.status(404).send('找不到該空間資料');
@@ -30,7 +30,7 @@ router.get('/:department', function(req, res) {
     ref = req.database.ref('/space');
     ref.once("value").then(function(snapshot) {
         let spaceObject = snapshot.val();
-        if(spaceObject.hasOwnProperty(department)) {
+        if(Object.prototype.hasOwnProperty.call(spaceObject, department)) {
             res.status(200).send(spaceObject[department]);
         } else {
             res.status(404).send('找不到該院別資料');
