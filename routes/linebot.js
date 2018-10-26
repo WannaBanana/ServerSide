@@ -20,6 +20,7 @@ router.post('/notify', function (req, res) {
     let department = requestObject.department;
     let space = requestObject.space;
     let message = requestObject.message;
+    console.log(requestObject);
     let ref = database.ref('/subscribe');
     let promises = [];
     let userGroup = [];
@@ -29,13 +30,16 @@ router.post('/notify', function (req, res) {
             for(let user in subscribeObject) {
                 for(let dep in subscribeObject[user]) {
                     if(dep == department) {
+                        console.log(department);
                         for(let spc in subscribeObject[user][department]) {
                             if(spc == space) {
+                                console.log(space);
                                 ref = database.ref('/user/' + uesr + '/' + lineUserID);
                                 promises.push(new Promise((resolve, reject) => {
                                     ref.once("value").then(function(lineData) {
                                         let lineID = lineData.val();
                                         if(lineID && lineID.length != 5) {
+                                            console.log(lineID);
                                             userGroup.push(lineID);
                                             resolve();
                                         }
@@ -48,6 +52,7 @@ router.post('/notify', function (req, res) {
             }
         }
         Promise.all(promises).then(()=>{
+            console.log(send);
             bot.multicast(userGroup, message);
         });
     });
