@@ -52,7 +52,8 @@ router.post('/notify', function (req, res) {
             }
         }
         Promise.all(promises).then(()=>{
-            console.log(send);
+            console.log("send");
+            console.log(userGroup);
             bot.multicast(userGroup, message);
         });
     });
