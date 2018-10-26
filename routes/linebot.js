@@ -34,7 +34,7 @@ router.post('/notify', function (req, res) {
                         console.log(department);
                         if(subscribeObject[user][department].indexOf(space) != -1) {
                             console.log(space);
-                            ref = database.ref('/user/' + user + '/' + lineUserID);
+                            ref = database.ref('/user/' + user + '/lineUserID');
                             promises.push(new Promise((resolve, reject) => {
                                 ref.once("value").then(function(lineData) {
                                     let lineID = lineData.val();
