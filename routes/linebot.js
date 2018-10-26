@@ -27,6 +27,7 @@ router.post('/notify', function (req, res) {
     ref.once("value").then(function(snapshot) {
         let subscribeObject = snapshot.val();
         if(subscribeObject) {
+            console.log(subscribeObject);
             for(let user in subscribeObject) {
                 for(let dep in subscribeObject[user]) {
                     if(dep == department) {
