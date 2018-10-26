@@ -16,7 +16,7 @@ const bot = linebot({
 
 router.post('/notify', function (req, res) {
     database = req.database
-    let requestObject = JSON.parse(JSON.stringify(req.body));
+    let requestObject = req.body;
     let department = requestObject.department;
     let space = requestObject.space;
     let message = requestObject.message;
