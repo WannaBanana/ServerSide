@@ -77,10 +77,10 @@ router.get('/', function(req, res) {
 });
 
 /* 預約 */
-router.post('/:department/:space', function(req, res) {
+router.post('/admin/:department/:space', function(req, res) {
     let department = req.params.department;
     let space = req.params.space;
-    let requestObject = JSON.parse(JSON.stringify(req.body));
+    let requestObject = req.body;
     let verify_fields = ["name", "phone", "title", "type", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
     for(let key in verify_fields) {
@@ -201,6 +201,206 @@ router.post('/:department/:space', function(req, res) {
                         "type": requestObject.type,
                         "start": begin.toISOString(),
                         "end": stop.toISOString(),
+                        "state": "已核准"
+                    };
+                    // 如果是重複性預約, 則 repeat 值為 true, 反之
+                    if(requestObject.repeat != 'none') {
+                        object["repeat"] = true;
+                    } else {
+                        object["repeat"] = false;
+                    }
+                    // 將衍伸子預約填回父預約 Key 值
+                    var parent_arr = [];
+                    ref.push(object).then((push_snapshot) => {
+                        if(parent_arr.length != 0) {
+                            let parentKey = parent_arr.pop();
+                            ref = req.database.ref('/reservation/' + department + '/' + space + '/');
+                            ref.once('value').then(function(snapshot) {
+                                let spaceReservation = snapshot.val();
+                                for(let date in spaceReservation) {
+                                    for(let self_key in spaceReservation[date]) {
+                                        if(self_key == parentKey) {
+                                            ref.child(date).child(parentKey).child('child').set(push_snapshot.key);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                        parent_arr.push(push_snapshot.key);
+                    });
+                    succes++;
+                }
+                // 非重複性預約則結束迴圈
+                if(requestObject.repeat == 'none') {
+                    break;
+                // 判斷是否已到終止日期
+                } else {
+                    console.log('重複直到: ' + new Date(requestObject.repeat_end));
+                    switch(requestObject.repeat) {
+                        case 'daily':
+                            begin.setDate(begin.getDate() + 1);
+                            stop.setDate(stop.getDate() + 1);
+                            break;
+                        case 'weekly':
+                            begin.setDate(begin.getDate() + 7);
+                            stop.setDate(stop.getDate() + 7);
+                            break;
+                        case 'biweekly':
+                            begin.setDate(begin.getDate() + 14);
+                            stop.setDate(stop.getDate() + 14);
+                            break;
+                        case 'monthly':
+                            begin.setMonth(begin.getMonth() + 1);
+                            stop.setMonth(stop.getMonth() + 1);
+                            break;
+                        default:
+                            res.status(403).send({
+                                "message": "重複格式錯誤"
+                            });
+                            return;
+                    }
+                    console.log(begin, stop);
+                    if(new Date(requestObject.repeat_end) < stop) {
+                        break;
+                    }
+                }
+            }
+            res.status(200).send({
+                "message": '預約成功 - 筆數: ' + succes + ', 預約失敗 - 筆數: ' + fail
+            });
+        });
+    } else {
+        res.status(403).send({
+            "message": '缺少' + lack_fields.join(', ') + '欄位'
+        });
+    }
+});
+
+router.post('/:department/:space', function(req, res) {
+    let department = req.params.department;
+    let space = req.params.space;
+    let requestObject = req.body;
+    let verify_fields = ["name", "phone", "title", "type", "start", "end", "repeat", "repeat_end", "conflict"];
+    let lack_fields = [];
+    for(let key in verify_fields) {
+        if(!requestObject.hasOwnProperty(verify_fields[key])) {
+            lack_fields.push(verify_fields[key]);
+        }
+    }
+    if(lack_fields.length == 0) {
+        let reservationCurrent = undefined;
+        ref = req.database.ref('/reservation/' + department + '/' + space + '/');
+        ref.once('value').then(function(snapshot) {
+            // 如果有資料的情況
+            if(snapshot.hasChildren()) {
+                reservationCurrent = snapshot.val();
+                console.log('有資料: ' + JSON.stringify(reservationCurrent));
+            }
+            // 防止時間顛倒
+            console.log('處理時間顛倒');
+            if(new Date(requestObject.start) > new Date(requestObject.end)) {
+                [requestObject.start, requestObject.end] = [requestObject.end, requestObject.start];
+            }
+            console.log('檢查衝突')
+            // 檢查衝突, 在禁止衝突的情況
+            let begin = new Date(requestObject.start);
+            let stop = new Date(requestObject.end);
+            console.log('Start: ' + begin + ', end: ' + stop);
+            // 不允許衝突情況下需檢查衝突
+            if(requestObject.conflict == 'false') {
+                console.log('不允許衝突');
+                while(reservationCurrent != undefined) {
+                    let date = new Date(begin).toISOString().slice(0, 10);
+                    console.log('日期檢查: ' + date);
+                    if(reservationCurrent && reservationCurrent[date] != undefined) {
+                        for(key in reservationCurrent[date]) {
+                            // 若開始時間是已經被預約的期間, 則回傳時間衝突
+                            if((new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].end) > begin) || (new Date(reservationCurrent[date][key].start) < stop && new Date(reservationCurrent[date][key].end) >= stop)) {
+                                console.log('時間衝突');
+                                res.status(403).send({
+                                    "message": "時間衝突"
+                                });
+                                return;
+                            }
+                            console.log('時間未衝突');
+                        }
+                    }
+                    // 非重複性預約則結束迴圈
+                    if(requestObject.repeat == 'none') {
+                        break;
+                    // 判斷是否已到終止日期
+                    } else {
+                        console.log('重複直到: ' + new Date(requestObject.repeat_end));
+                        switch(requestObject.repeat) {
+                            case 'daily':
+                                begin.setDate(begin.getDate() + 1);
+                                stop.setDate(stop.getDate() + 1);
+                                break;
+                            case 'weekly':
+                                begin.setDate(begin.getDate() + 7);
+                                stop.setDate(stop.getDate() + 7);
+                                break;
+                            case 'biweekly':
+                                begin.setDate(begin.getDate() + 14);
+                                stop.setDate(stop.getDate() + 14);
+                                break;
+                            case 'monthly':
+                                begin.setMonth(begin.getMonth() + 1);
+                                stop.setMonth(stop.getMonth() + 1);
+                                break;
+                            default:
+                                res.status(403).send({
+                                    "message": "重複格式錯誤"
+                                });
+                                return;
+                        }
+                        console.log(begin, stop);
+                        if(new Date(requestObject.repeat_end) < stop) {
+                            break;
+                        }
+                    }
+                }
+            }
+            // 插入預約
+            console.log('插入預約');
+            let succes = 0;
+            let fail = 0;
+            [begin, stop] = [new Date(requestObject.start), new Date(requestObject.end)];
+            console.log('Start: ' + begin + ', end: ' + stop + ', reservationCurrent: ' + reservationCurrent);
+            while(true) {
+                // (年 / 月 / 日)來作為該天預約索引值
+                let date = new Date(begin).toISOString().slice(0, 10);
+                console.log('日期檢查: ' + date);
+                // 用來判斷是否有衝突
+                let conflict = false;
+                ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date);
+                if(reservationCurrent && reservationCurrent[date] != undefined) {
+                    for(key in reservationCurrent[date]) {
+                        if((new Date(reservationCurrent[date][key].start) <= begin && new Date(reservationCurrent[date][key].end) > begin) || (new Date(reservationCurrent[date][key].start) < stop && new Date(reservationCurrent[date][key].end) >= stop)) {
+                            conflict = true;
+                            fail++;
+                            console.log('衝突');
+                            // 只有一筆的情況衝突
+                            if(requestObject.repeat == 'none') {
+                                res.status(403).send({
+                                    "message": "時間衝突"
+                                });
+                                return;
+                            }
+                        }
+                    }
+                }
+                if(conflict == false) {
+                    console.log('未衝突');
+                    // 預先填入資料
+                    let object = {
+                        "name": requestObject.name,
+                        "phone": requestObject.phone,
+                        "title": requestObject.title,
+                        "type": requestObject.type,
+                        "start": begin.toISOString(),
+                        "end": stop.toISOString(),
+                        "state": "未核准"
                     };
                     // 如果是重複性預約, 則 repeat 值為 true, 反之
                     if(requestObject.repeat != 'none') {
@@ -280,7 +480,7 @@ router.patch('/:department/:space/:key', function(req, res) {
     let key = req.params.key;
     let department = req.params.department;
     let space = req.params.space;
-    let requestObject = JSON.parse(JSON.stringify(req.body));
+    let requestObject = req.body;
     let verify_fields = ["title", "type", "start", "end"];
     let lack_fields = [];
     for(let key in verify_fields) {
@@ -341,12 +541,36 @@ router.patch('/:department/:space/:key', function(req, res) {
     }
 });
 
+/* 批准預約 */
+router.put('/:department/:space/:key', function(req, res) {
+    let key = req.params.key;
+    let department = req.params.department;
+    let space = req.params.space;
+    console.log('key: ' + key);
+    console.log(requestObject);
+    ref = req.database.ref('/reservation/' + department + '/' + space + '/' + key);
+    ref.once('value').then(function(snapshot) {
+        let reservationObject = snapshot.val();
+        if(reservationObject) {
+            ref.child('state').set("已核准").then(()=>{
+                res.status(200).send({
+                    "message": "審核成功"
+                });
+            });
+        } else {
+            res.status(404).send({
+                "message": "找不到該筆預約資料"
+            });
+        }
+    });
+});
+
 /* 刪除預約 */
 router.delete('/:department/:space/:key', function(req, res) {
     let key = req.params.key;
     let department = req.params.department;
     let space = req.params.space;
-    let requestObject = JSON.parse(JSON.stringify(req.body));
+    let requestObject = req.body;
     let verify_fields = ["deleteRepeat"];
     let lack_fields = [];
     for(let key in verify_fields) {
