@@ -57,7 +57,7 @@ router.get('/:department/:space', function(req, res) {
 /* 獲得各院空間預約資訊 */
 router.get('/book/:department', function(req, res) {
     let department = req.params.department;
-    ref = database.ref('/reservation/' + department);
+    ref = req.database.ref('/reservation/' + department);
     ref.once("value").then(function(snapshot) {
         let responseObject = {};
         let reservationObject = snapshot.val();
