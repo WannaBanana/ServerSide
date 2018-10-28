@@ -102,7 +102,7 @@ router.patch('/:department/:space/:item', function(req, res) {
     let space = req.params.space;
     let item = req.params.item;
     let requestObject = req.body;
-    let verify_fields = ["imgSrc", "itemRule", "type"];
+    let verify_fields = ["itemName", "imgSrc", "itemRule", "type"];
     let lack_fields = [];
     for(let key in verify_fields) {
         if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
