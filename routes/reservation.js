@@ -57,10 +57,12 @@ router.get('/:department/:space', function(req, res) {
 /* 獲得各院空間預約資訊 */
 router.get('/book/:department', function(req, res) {
     let department = req.params.department;
+    console.log(department);
     ref = req.database.ref('/reservation/' + department);
     ref.once("value").then(function(snapshot) {
         let responseObject = {};
         let reservationObject = snapshot.val();
+        console.log(reservationObject);
         if(reservationObject) {
             for(let space in reservationObject) {
                 for(let date in reservationObject[space]) {
@@ -75,7 +77,7 @@ router.get('/book/:department', function(req, res) {
             }
             res.status(200).send(responseObject);
         } else {
-            res.status(404).send('找不到該院別資料');
+            res.status(404).send({"message": "找不到該院別資料"});
         }
     });
 });
