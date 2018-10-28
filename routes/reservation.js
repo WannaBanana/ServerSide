@@ -1,6 +1,34 @@
 var express = require('express');
 var router = express.Router();
 
+/* 獲得各院空間預約資訊 */
+router.get('/book/:department', function(req, res) {
+    let department = req.params.department;
+    console.log(department);
+    ref = req.database.ref('/reservation/' + department);
+    ref.once("value").then(function(snapshot) {
+        let responseObject = {};
+        let reservationObject = snapshot.val();
+        console.log(reservationObject);
+        if(reservationObject) {
+            for(let space in reservationObject) {
+                for(let date in reservationObject[space]) {
+                    for(let key in reservationObject[space][date]) {
+                        if(reservationObject[space][date][key].state == '未核准') {
+                            responseObject[space] = {};
+                            responseObject[space][date] = {};
+                            responseObject[space][date][key] = reservationObject[space][date][key];
+                        }
+                    }
+                }
+            }
+            res.status(200).send(responseObject);
+        } else {
+            res.status(404).send({"message": "找不到該院別資料"});
+        }
+    });
+});
+
 /* 查詢單筆預約資訊 */
 router.get('/:department/:space/:key', function(req, res) {
     let department = req.params.department;
@@ -51,33 +79,6 @@ router.get('/:department/:space', function(req, res) {
             });
         } else {
             res.status(404).send('找不到該院別資料');
-        }
-    });
-});
-/* 獲得各院空間預約資訊 */
-router.get('/book/:department', function(req, res) {
-    let department = req.params.department;
-    console.log(department);
-    ref = req.database.ref('/reservation/' + department);
-    ref.once("value").then(function(snapshot) {
-        let responseObject = {};
-        let reservationObject = snapshot.val();
-        console.log(reservationObject);
-        if(reservationObject) {
-            for(let space in reservationObject) {
-                for(let date in reservationObject[space]) {
-                    for(let key in reservationObject[space][date]) {
-                        if(reservationObject[space][date][key].state == '未核准') {
-                            responseObject[space] = {};
-                            responseObject[space][date] = {};
-                            responseObject[space][date][key] = reservationObject[space][date][key];
-                        }
-                    }
-                }
-            }
-            res.status(200).send(responseObject);
-        } else {
-            res.status(404).send({"message": "找不到該院別資料"});
         }
     });
 });
