@@ -19,6 +19,7 @@ var room = require('./routes/room');
 var reservation = require('./routes/reservation');
 var linebot = require('./routes/linebot');
 var alert = require('./routes/alert');
+var permission = require('./routes/permission');
 
 var app = express();
 app.use(cors());
@@ -76,6 +77,7 @@ app.use('/api/room', room);
 app.use('/api/reservation', reservation);
 app.use('/api/linebot', linebot);
 app.use('/api/alert', alert);
+app.use('/api/permission', permission);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
