@@ -59,7 +59,7 @@ router.post('/:department/:space', function(req, res) {
     let department = req.params.department;
     let space = req.params.space;
     let requestObject = req.body;
-    let verify_fields = ["itemID", "imgSrc", "itemRule", "type"];
+    let verify_fields = ["itemID", "itemName", "imgSrc", "itemRule", "type"];
     let lack_fields = [];
     for(let key in verify_fields) {
         if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
@@ -71,8 +71,8 @@ router.post('/:department/:space', function(req, res) {
         ref.once("value").then(function(snapshot){
             let spaceItemObject = snapshot.val();
             if(spaceItemObject && Object.prototype.hasOwnProperty.call(spaceItemObject, requestObject.itemID)) {
-                res.status(403).send({
-                    "message": '缺少' + lack_fields.join(', ') + '欄位'
+                res.status(406).send({
+                    "message": "該物品編號已被使用"
                 });
             } else {
                 ref = req.database.ref('/item/' + department + '/' + space + '/' + requestObject.itemID);
