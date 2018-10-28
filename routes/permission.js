@@ -3,7 +3,6 @@ var router = express.Router();
 
 router.get('/admin/:sid', function(req, res) {
     let sid = req.params.sid;
-    let sid = req.params.sid;
     ref = req.database.ref('/permission/' + sid);
     ref.once("value").then(function(snapshot) {
         let permissionObject = snapshot.val();
