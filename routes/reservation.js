@@ -434,6 +434,7 @@ router.post('/:department/:space', function(req, res) {
                     // 如果是重複性預約, 則 repeat 值為 true, 反之
                     if(requestObject.repeat != 'none') {
                         object["repeat"] = true;
+                        object["repeat_type"] = requestObject.repeat;
                     } else {
                         object["repeat"] = false;
                     }
