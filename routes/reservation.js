@@ -57,10 +57,10 @@ router.get('/:department/:space', function(req, res) {
 /* 獲得各院空間預約資訊 */
 router.get('/book/:department', function(req, res) {
     let department = req.params.department;
-    ref = req.database.ref('/reservation');
+    ref = req.database.ref('/reservation/' + department);
     ref.orderByChild('state').equalTo('未核准').once("value").then(function(snapshot) {
         let reservationObject = snapshot.val();
-        if(Object.prototype.hasOwnProperty.call(reservationObject, department)) {
+        if(reservationObject) {
             res.status(200).send(reservationObject[department]);
         } else {
             res.status(404).send('找不到該院別資料');
