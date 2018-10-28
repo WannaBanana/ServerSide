@@ -37,7 +37,7 @@ router.post('/:sid', function(req, res) {
                 ref.once('value').then(function(card_snapshot) {
                     if(card_snapshot.exists()) {
                         let userCard = card_snapshot.val();
-                        console.log(userCard);
+                        // console.log(userCard);
                         for(let key in userCard) {
                             if(userCard[key].cardID == requestObject.cardID) {
                                 res.status(406).send({"message": "卡號重複"});
@@ -72,7 +72,7 @@ router.post('/:sid', function(req, res) {
 /* 新增帳號 */
 router.post('/', function(req, res) {
     let requestObject = JSON.parse(JSON.stringify(req.body));
-    console.log(requestObject);
+    // console.log(requestObject);
     let verify_fields = ["photo", "first_name", "last_name", "email", "password", "student_id", "cellphone"];
     let lack_fields = [];
     for(let key in verify_fields) {
@@ -117,8 +117,8 @@ router.patch('/:sid', function(req, res) {
     let requestObject = req.body;
     ref = req.database.ref('/user');
     let verify_fields = ["photo", "name", "email", "cellphone"];
-    console.log(requestObject);
-    console.log(requestObject.password);
+    // console.log(requestObject);
+    // console.log(requestObject.password);
     if(!requestObject.password) {
         res.status(401).send({"message": "沒有填寫密碼欄位"});
         return
@@ -129,8 +129,8 @@ router.patch('/:sid', function(req, res) {
             ref = req.database.ref('/user/' + sid);
             ref.once('value').then(function(student_snapshot) {
                 let studentObject = student_snapshot.val();
-                console.log(studentObject.password);
-                console.log(crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex'));
+                // console.log(studentObject.password);
+                // console.log(crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex'));
                 if(studentObject.password == crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex')) {
                     for(let key in verify_fields) {
                         if(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key])) {
@@ -185,7 +185,7 @@ router.delete('/:sid/card/:cardID', function(req, res) {
             ref = req.database.ref('/user/' + sid + '/card');
             ref.once('value').then(function(card_snapshot) {
                 if(card_snapshot.exists()) {
-                    console.log(card_snapshot);
+                    // console.log(card_snapshot);
                     let userCard = card_snapshot.val();
                     let index = -1;
                     for(let item in userCard) {
