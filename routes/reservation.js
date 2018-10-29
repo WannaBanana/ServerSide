@@ -573,38 +573,50 @@ router.patch('/:department/:space/:key', function(req, res) {
 
 /* 批准預約 */
 router.put('/:department/:space/', function(req, res) {
-    let keys = req.body.keys;
+    let requestObject = req.body;
     let department = req.params.department;
     let space = req.params.space;
-    // console.log('key: ' + key);
-    // console.log(requestObject);
-    let responseObject = {};
-    let promises = [];
-    ref = req.database.ref('/reservation/' + department + '/' + space);
-    ref.once('value').then(function(snapshot) {
-        let reservationObject = snapshot.val();
-        if(reservationObject) {
-            for(let date in reservationObject) {
-                for(let key in reservationObject[date]) {
-                    for(let index in keys) {
-                        if(keys[index] == key) {
-                            promises.push(new Promise((resolve, reject) => {
-                                ref.child(date).child(keys[index]).child('state').set("已核准").then(()=>{
-                                    responseObject[keys[index]] = "已核准"
-                                    resolve();
-                                });
-                            }));
+    let verify_fields = ["keys"];
+    let lack_fields = [];
+    for(let key in verify_fields) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
+            lack_fields.push(verify_fields[key]);
+        }
+    }
+    if(lack_fields.length == 0) {
+        let keys = requestObject.keys;
+        let responseObject = {};
+        let promises = [];
+        ref = req.database.ref('/reservation/' + department + '/' + space);
+        ref.once('value').then(function(snapshot) {
+            let reservationObject = snapshot.val();
+            if(reservationObject) {
+                for(let date in reservationObject) {
+                    for(let key in reservationObject[date]) {
+                        for(let index in keys) {
+                            if(keys[index] == key) {
+                                promises.push(new Promise((resolve, reject) => {
+                                    ref.child(date).child(keys[index]).child('state').set("已核准").then(()=>{
+                                        responseObject[keys[index]] = "已核准"
+                                        resolve();
+                                    });
+                                }));
+                            }
                         }
                     }
                 }
+                Promise.all(promises).then(() => {
+                    res.status(200).send(responseObject);
+                });
+            } else {
+                res.status(404).send({"message": "該院無預約資料"});
             }
-            Promise.all(promises).then(() => {
-                res.status(200).send(responseObject);
-            });
-        } else {
-            res.status(404).send({"message": "該院無預約資料"});
-        }
+        });
+    } else {
+    res.status(403).send({
+        "message": '缺少' + lack_fields.join(', ') + '欄位'
     });
+}
 });
 
 /* 刪除預約 */
