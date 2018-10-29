@@ -580,27 +580,30 @@ router.put('/:department/:space/', function(req, res) {
     // console.log(requestObject);
     let responseObject = {};
     let promises = [];
-    for(let key in keys) {
-        promises.push(new Promise((resolve, reject) => {
-            ref = req.database.ref('/reservation/' + department + '/' + space + '/' + keys[key]);
-            ref.once('value').then(function(snapshot) {
-                let reservationObject = snapshot.val();
-                if(reservationObject) {
-                    ref.child('state').set("已核准").then(()=>{
-                        responseObject[keys[key]] = "已核准"
-                        resolve();
-                    });
-                } else {
-                    responseObject[keys[key]] = "找不到該筆資料"
-                    reject();
+    ref = req.database.ref('/reservation/' + department + '/' + space);
+    ref.once('value').then(function(snapshot) {
+        let reservationObject = snapshot.val();
+        if(reservationObject) {
+            for(let date in reservationObject) {
+                for(let key in reservationObject[date]) {
+                    for(let index in keys) {
+                        if(keys[index] == key) {
+                            promises.push(new Promise(() => {
+                                ref.child(date).child(keys[key]).child('state').set("已核准").then(()=>{
+                                    responseObject[keys[key]] = "已核准"
+                                    resolve();
+                                });
+                            }));
+                        }
+                    }
                 }
+            }
+            Promise.all(promises).then(() => {
+                res.status(200).send(responseObject);
             });
-        }));
-    }
-    Promise.all(promises).then(() => {
-        res.status(200).send(responseObject);
-    }).catch(() => {
-        res.status(404).send(responseObject);
+        } else {
+            res.status(404).send({"message": "該院無預約資料"});
+        }
     });
 });
 
