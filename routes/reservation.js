@@ -572,26 +572,33 @@ router.patch('/:department/:space/:key', function(req, res) {
 });
 
 /* 批准預約 */
-router.put('/:department/:space/:key', function(req, res) {
-    let key = req.params.key;
+router.put('/:department/:space/', function(req, res) {
+    let keys = req.body.keys;
     let department = req.params.department;
     let space = req.params.space;
     // console.log('key: ' + key);
     // console.log(requestObject);
-    ref = req.database.ref('/reservation/' + department + '/' + space + '/' + key);
-    ref.once('value').then(function(snapshot) {
-        let reservationObject = snapshot.val();
-        if(reservationObject) {
-            ref.child('state').set("已核准").then(()=>{
-                res.status(200).send({
-                    "message": "審核成功"
-                });
+    let responseObject = {};
+    let promises = [];
+    for(let key in keys) {
+        promises.push(new Promise((resolve, reject) => {
+            ref = req.database.ref('/reservation/' + department + '/' + space + '/' + key);
+            ref.once('value').then(function(snapshot) {
+                let reservationObject = snapshot.val();
+                if(reservationObject) {
+                    ref.child('state').set("已核准").then(()=>{
+                        responseObject[key] = "已核准"
+                        resolve();
+                    });
+                } else {
+                    responseObject[key] = "找不到該筆資料"
+                    reject();
+                }
             });
-        } else {
-            res.status(404).send({
-                "message": "找不到該筆預約資料"
-            });
-        }
+        }));
+    }
+    Promise.all(promises).then(() => {
+        res.status(200).send(responseObject);
     });
 });
 
