@@ -588,7 +588,7 @@ router.put('/:department/:space/', function(req, res) {
                 for(let key in reservationObject[date]) {
                     for(let index in keys) {
                         if(keys[index] == key) {
-                            promises.push(new Promise(() => {
+                            promises.push(new Promise((resolve, reject) => {
                                 ref.child(date).child(keys[index]).child('state').set("已核准").then(()=>{
                                     responseObject[keys[index]] = "已核准"
                                     resolve();
