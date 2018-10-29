@@ -582,16 +582,16 @@ router.put('/:department/:space/', function(req, res) {
     let promises = [];
     for(let key in keys) {
         promises.push(new Promise((resolve, reject) => {
-            ref = req.database.ref('/reservation/' + department + '/' + space + '/' + key);
+            ref = req.database.ref('/reservation/' + department + '/' + space + '/' + keys[key]);
             ref.once('value').then(function(snapshot) {
                 let reservationObject = snapshot.val();
                 if(reservationObject) {
                     ref.child('state').set("已核准").then(()=>{
-                        responseObject[key] = "已核准"
+                        responseObject[keys[key]] = "已核准"
                         resolve();
                     });
                 } else {
-                    responseObject[key] = "找不到該筆資料"
+                    responseObject[keys[key]] = "找不到該筆資料"
                     reject();
                 }
             });
