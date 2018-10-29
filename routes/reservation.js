@@ -589,8 +589,8 @@ router.put('/:department/:space/', function(req, res) {
                     for(let index in keys) {
                         if(keys[index] == key) {
                             promises.push(new Promise(() => {
-                                ref.child(date).child(keys[key]).child('state').set("已核准").then(()=>{
-                                    responseObject[keys[key]] = "已核准"
+                                ref.child(date).child(keys[index]).child('state').set("已核准").then(()=>{
+                                    responseObject[keys[index]] = "已核准"
                                     resolve();
                                 });
                             }));
