@@ -599,6 +599,8 @@ router.put('/:department/:space/', function(req, res) {
     }
     Promise.all(promises).then(() => {
         res.status(200).send(responseObject);
+    }).catch(() => {
+        res.status(404).send(responseObject);
     });
 });
 
