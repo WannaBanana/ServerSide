@@ -44,7 +44,8 @@ router.get('/book/:department', function(req, res) {
                         if(reservationObject[space][date][key].state == '未核准') {
                             if(!Object.prototype.hasOwnProperty.call(responseObject, space)) {
                                 responseObject[space] = {};
-                            } else if (!Object.prototype.hasOwnProperty.call(responseObject[space], date)) {
+                            }
+                            if (!Object.prototype.hasOwnProperty.call(responseObject[space], date)) {
                                 responseObject[space][date] = {};
                             }
                             responseObject[space][date][key] = reservationObject[space][date][key];
