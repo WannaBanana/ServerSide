@@ -298,7 +298,7 @@ router.post('/reservation/admin/:department/:space', function(req, res) {
     }
 });
 
-router.post('/:department/:space', function(req, res) {
+router.post('/reservation/:department/:space', function(req, res) {
     let department = req.params.department;
     let space = req.params.space;
     let requestObject = req.body;
