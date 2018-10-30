@@ -12,9 +12,9 @@ router.get('/book/:department/:space', function(req, res) {
         let reservationObject = snapshot.val();
         // console.log(reservationObject);
         if(reservationObject) {
-            for(let date in reservationObject[space]) {
-                for(let key in reservationObject[space][date]) {
-                    if(reservationObject[space][date][key].state == '未核准') {
+            for(let date in reservationObject) {
+                for(let key in reservationObject[date]) {
+                    if(reservationObject[date][key].state == '未核准') {
                         responseObject[date] = {};
                         responseObject[date][key] = reservationObject[date][key];
                     }
