@@ -217,10 +217,10 @@ router.post('/reservation/admin/:department/:space', function(req, res) {
                     // console.log('未衝突');
                     // 預先填入資料
                     let object = {
-                        "name": requestObject.name,
-                        "phone": requestObject.phone,
+                        "studentID": requestObject.studentID,
+                        "department": requestObject.department,
                         "title": requestObject.title,
-                        "type": requestObject.type,
+                        "itemID": requestObject.itemID,
                         "start": begin.toISOString(),
                         "end": stop.toISOString(),
                         "state": "已核准"
@@ -416,10 +416,10 @@ router.post('/reservation/:department/:space', function(req, res) {
                     // console.log('未衝突');
                     // 預先填入資料
                     let object = {
-                        "name": requestObject.name,
-                        "phone": requestObject.phone,
+                        "studentID": requestObject.studentID,
+                        "department": requestObject.department,
                         "title": requestObject.title,
-                        "type": requestObject.type,
+                        "itemID": requestObject.itemID,
                         "start": begin.toISOString(),
                         "end": stop.toISOString(),
                         "state": "未核准"
