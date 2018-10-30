@@ -15,9 +15,10 @@ router.get('/book/:department/:space', function(req, res) {
             for(let date in reservationObject) {
                 for(let key in reservationObject[date]) {
                     if(reservationObject[date][key].state == '未核准') {
+                        if(!Object.prototype.hasOwnProperty.call(responseObject, date))
                         responseObject[date] = {};
-                        responseObject[date][key] = reservationObject[date][key];
                     }
+                    responseObject[date][key] = reservationObject[date][key];
                 }
             }
             res.status(200).send(responseObject);
@@ -40,9 +41,9 @@ router.get('/book/:department', function(req, res) {
                 for(let date in reservationObject[space]) {
                     for(let key in reservationObject[space][date]) {
                         if(reservationObject[space][date][key].state == '未核准') {
-                            if(responseObject[space] == undefined) {
+                            if(!Object.prototype.hasOwnProperty.call(responseObject, space)) {
                                 responseObject[space] = {};
-                            } else if (responseObject[space][date] == undefined) {
+                            } else if (!Object.prototype.hasOwnProperty.call(responseObject[space], date)) {
                                 responseObject[space][date] = {};
                             }
                             responseObject[space][date][key] = reservationObject[space][date][key];
