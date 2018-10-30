@@ -2,6 +2,32 @@ var express = require('express');
 var router = express.Router();
 
 /* 獲得各院空間預約資訊 */
+router.get('/book/:department/:space', function(req, res) {
+    let department = req.params.department;
+    let space = req.params.space;
+    // console.log(department);
+    ref = req.database.ref('/reservation/' + department + '/' + space);
+    ref.once("value").then(function(snapshot) {
+        let responseObject = {};
+        let reservationObject = snapshot.val();
+        // console.log(reservationObject);
+        if(reservationObject) {
+            for(let date in reservationObject[space]) {
+                for(let key in reservationObject[space][date]) {
+                    if(reservationObject[space][date][key].state == '未核准') {
+                        responseObject[space] = {};
+                        responseObject[space][date] = {};
+                        responseObject[space][date][key] = reservationObject[space][date][key];
+                    }
+                }
+            }
+            res.status(200).send(responseObject);
+        } else {
+            res.status(404).send({"message": "找不到該空間資料"});
+        }
+    });
+});
+
 router.get('/book/:department', function(req, res) {
     let department = req.params.department;
     // console.log(department);
