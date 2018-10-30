@@ -44,7 +44,15 @@ router.get('/:sid', function(req, res) {
 router.post('/admin/:sid', function(req, res) {
     let sid = req.params.sid;
     ref = req.database.ref('/permission/' + sid + '/admin');
-    res.set(true).then(()=>{
+    ref.set(true).then(()=>{
+        res.status(200).send({"message": "管理員設定成功"});
+    });
+});
+
+router.delete('/admin/:sid', function(req, res) {
+    let sid = req.params.sid;
+    ref = req.database.ref('/permission/' + sid + '/admin');
+    ref.set(false).then(()=>{
         res.status(200).send({"message": "管理員設定成功"});
     });
 });
