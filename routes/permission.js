@@ -67,7 +67,9 @@ router.post('/:sid', function(req, res) {
         if(permissionObject) {
             for(let dep in requestObject) {
                 for(let space in requestObject[dep]) {
-                    permissionObject[dep].push(requestObject[dep][space]);
+                    if(permissionObject[dep].indexOf(requestObject[dep][space]) == -1) {
+                        permissionObject[dep].push(requestObject[dep][space]);
+                    }
                 }
             }
             ref.set(permissionObject).then(() => {
@@ -85,7 +87,9 @@ router.put('/:sid', function(req, res) {
     let sid = req.params.sid;
     let requestObject = req.body;
     ref = req.database.ref('/permission/' + sid + '/space');
-    ref.set(requestObject);
+    ref.set(requestObject).then(()=>{
+        res.status(200).send({"message": "權限替換成功"});
+    });
 });
 
 /* 刪除權限 */
@@ -98,7 +102,9 @@ router.delete('/:sid', function(req, res) {
         if(permissionObject) {
             for(let dep in requestObject) {
                 for(let space in requestObject[dep]) {
-                    permissionObject[dep].splice(permissionObject[dep].indexOf(requestObject[dep][space]), 1);
+                    if(permissionObject[dep].indexOf(requestObject[dep][space]) != -1) {
+                        permissionObject[dep].splice(permissionObject[dep].indexOf(requestObject[dep][space]), 1);
+                    }
                 }
             }
             ref.set(permissionObject).then(() => {
