@@ -15,10 +15,11 @@ router.get('/book/:department/:space', function(req, res) {
             for(let date in reservationObject) {
                 for(let key in reservationObject[date]) {
                     if(reservationObject[date][key].state == '未核准') {
-                        if(!Object.prototype.hasOwnProperty.call(responseObject, date))
-                        responseObject[date] = {};
+                        if(!Object.prototype.hasOwnProperty.call(responseObject, date)) {
+                            responseObject[date] = {};
+                        }
+                        responseObject[date][key] = reservationObject[date][key];
                     }
-                    responseObject[date][key] = reservationObject[date][key];
                 }
             }
             res.status(200).send(responseObject);
