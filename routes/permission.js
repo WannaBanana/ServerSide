@@ -67,6 +67,8 @@ router.post('/:sid', function(req, res) {
         if(permissionObject) {
             for(let dep in requestObject) {
                 for(let space in requestObject[dep]) {
+                    console.log(typeof(permissionObject[dep]));
+                    console.log(permissionObject[dep]);
                     if(permissionObject[dep].indexOf(requestObject[dep][space]) == -1) {
                         permissionObject[dep].push(requestObject[dep][space]);
                     }
