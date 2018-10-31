@@ -170,7 +170,7 @@ bot.on('message', function (event) {
                             });
                             break;
                         case '取消訂閱':
-                            ref = database.ref('/subscribe/' + user);
+                            ref = database.ref('/subscribe/' + user + '/space');
                             ref.once("value").then(function(snapshot) {
                                 let subscribeObject = snapshot.val();
                                 let button = [];
