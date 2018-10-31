@@ -137,7 +137,7 @@ bot.on('message', function (event) {
                             });
                             break;
                         case '新增訂閱':
-                            ref = database.ref('/permission/' + user);
+                            ref = database.ref('/permission/' + user + '/space');
                             ref.once("value").then(function(snapshot) {
                                 let permissionObject = snapshot.val();
                                 let button = [];
@@ -203,7 +203,7 @@ bot.on('message', function (event) {
                             });
                             break;
                         case '管理空間':
-                            ref = database.ref('/permission/' + user);
+                            ref = database.ref('/permission/' + user + '/space');
                             ref.once("value").then(function(snapshot) {
                                 let permissionObject = snapshot.val();
                                 let button = [];
