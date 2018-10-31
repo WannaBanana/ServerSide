@@ -100,8 +100,14 @@ router.post('/', function(req, res) {
                     "cellphone": requestObject.cellphone,
                     "card": [null],
                     "state": "未驗證"
+                }).then(()=> {
+                    ref = req.database.ref('/permission/' + requestObject.student_id);
+                    ref.set({
+                        "admin": false
+                    }).then(()=>{
+                        res.status(200).send({ "message": "註冊成功"});
+                    });
                 });
-                res.status(200).send({ "message": "註冊成功"});
             } else {
                 res.status(406).send({ "message": "該學號已註冊"});
             }
