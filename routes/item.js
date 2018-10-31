@@ -30,33 +30,31 @@ router.get('/book/:department', function(req, res) {
 });
 
 /* 查詢單筆物品預約資訊 */
-router.get('/reservation/:department/:space/:key', function(req, res) {
+router.get('/reservation/:department/:space/:item', function(req, res) {
     let department = req.params.department;
     let space = req.params.space;
-    let key = req.params.key;
-    ref = req.database.ref('/itemReservation');
+    let item = req.params.item;
+    ref = req.database.ref('/itemReservation/' + department + '/' + space);
     ref.once("value").then(function(snapshot) {
         let reservationObject = snapshot.val();
-        if(Object.prototype.hasOwnProperty.call(reservationObject, department)) {
-            ref = req.database.ref('/itemReservation/' + department);
-            ref.once("value").then(function(department_snapshot) {
-                let departmentObject = department_snapshot.val();
-                if(Object.prototype.hasOwnProperty.call(departmentObject, space)) {
-                    for(let date in space) {
-                        for(let self_key in date) {
-                            if(self_key == key) {
-                                res.status(200).send(departmentObject[date][key]);
-                                return;
-                            }
+        let responseObject = {};
+        if(reservationObject) {
+            for(let date in reservationObject) {
+                for(let key in reservationObject[date]) {
+                    if(reservationObject[date][key].itemID == item) {
+                        if(!(Object.prototype.hasOwnProperty.call(responseObject, date))) {
+                            responseObject[date] = {};
                         }
+                        if(!(Object.prototype.hasOwnProperty.call(responseObject[date], key))) {
+                            responseObject[date][key] = {};
+                        }
+                        responseObject[date][key] = reservationObject[date][key];
                     }
-                    res.status(404).send('找不到該筆預約資料');
-                } else {
-                    res.status(404).send('找不到該空間資料');
                 }
-            });
+            }
+            res.status(200).send(responseObject);
         } else {
-            res.status(404).send('找不到該院別資料');
+            res.status(404).send({"message": "找不到該空間預約資訊"})
         }
     });
 });
