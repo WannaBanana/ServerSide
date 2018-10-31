@@ -675,7 +675,7 @@ router.delete('/reservation/:department/:space/:key', function(req, res) {
 
 /* 獲得全部物品預約資訊 */
 router.get('/reservation', function(req, res) {
-    ref = req.database.ref('/reservation');
+    ref = req.database.ref('/itemReservation');
     ref.once('value').then(function(snapshot) {
         let reservation = snapshot.val();
         res.status(200).send(reservation);
