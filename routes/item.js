@@ -103,7 +103,7 @@ router.post('/reservation/admin/:department/:space', function(req, res) {
     let department = req.params.department;
     let space = req.params.space;
     let requestObject = req.body;
-    let verify_fields = ["studentID", "department", "itemID", "title", "start", "end", "repeat", "repeat_end", "conflict"];
+    let verify_fields = ["studentID", "itemID", "title", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
     for(let key in verify_fields) {
         if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
@@ -218,7 +218,6 @@ router.post('/reservation/admin/:department/:space', function(req, res) {
                     // 預先填入資料
                     let object = {
                         "studentID": requestObject.studentID,
-                        "department": requestObject.department,
                         "title": requestObject.title,
                         "itemID": requestObject.itemID,
                         "start": begin.toISOString(),
@@ -302,7 +301,7 @@ router.post('/reservation/:department/:space', function(req, res) {
     let department = req.params.department;
     let space = req.params.space;
     let requestObject = req.body;
-    let verify_fields = ["studentID", "department", "itemID", "title", "start", "end", "repeat", "repeat_end", "conflict"];
+    let verify_fields = ["studentID", "itemID", "title", "start", "end", "repeat", "repeat_end", "conflict"];
     let lack_fields = [];
     for(let key in verify_fields) {
         if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
@@ -417,7 +416,6 @@ router.post('/reservation/:department/:space', function(req, res) {
                     // 預先填入資料
                     let object = {
                         "studentID": requestObject.studentID,
-                        "department": requestObject.department,
                         "title": requestObject.title,
                         "itemID": requestObject.itemID,
                         "start": begin.toISOString(),
