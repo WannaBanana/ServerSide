@@ -498,6 +498,183 @@ router.post('/reservation/:department/:space', function(req, res) {
     }
 });
 
+/* 修改預約 */
+router.patch('/reservation/:department/:space/:key', function(req, res) {
+    let key = req.params.key;
+    let department = req.params.department;
+    let space = req.params.space;
+    let requestObject = req.body;
+    let verify_fields = ["title", "start", "end"];
+    let lack_fields = [];
+    for(let key in verify_fields) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
+            lack_fields.push(verify_fields[key]);
+        }
+    }
+    // console.log('key: ' + key);
+    // console.log(requestObject);
+    if(lack_fields.length == 0) {
+        ref = req.database.ref('/itemReservation/' + department + '/' + space + '/');
+        ref.once('value').then(function(snapshot) {
+            let spaceReservation = snapshot.val();
+            // console.log(spaceReservation);
+            for(let date in spaceReservation) {
+                // console.log('檢查 ' + date);
+                for(let self_key in spaceReservation[date]) {
+                    if(self_key == key) {
+                        // console.log('找到');
+                        // 檢查是否衝突
+                        let begin = new Date(requestObject.start);
+                        let stop = new Date(requestObject.end);
+                        for(let item in spaceReservation[date]) {
+                            if(item == key) {
+                                continue;
+                            }
+                            if((new Date(spaceReservation[date][item].start) <= begin && new Date(spaceReservation[date][item].end) > begin) || (new Date(spaceReservation[date][item].start) < stop && new Date(spaceReservation[date][item].end) >= stop)) {
+                                res.status(403).send({
+                                    "message": "時間衝突"
+                                });
+                                return;
+                            }
+                        }
+                        // 更新
+                        ref = req.database.ref('/reservation/' + department + '/' + space + '/' + date + '/' + self_key);
+                        ref.once('value').then(function(targetSnapshot) {
+                            let targetObject = targetSnapshot.val();
+                            targetObject["title"] = requestObject.title;
+                            targetObject["type"] = requestObject.type;
+                            targetObject["start"] = requestObject.start;
+                            targetObject["end"] = requestObject.end;
+                            ref.set(targetObject);
+                            res.status(200).send({
+                                "message": "更新成功"
+                            });
+                        });
+                    }
+                }
+            }
+            res.status(404).send({
+                "message": "找不到該筆預約資料"
+            });
+        });
+    } else {
+        res.status(403).send({
+            "message": '缺少' + lack_fields.join(', ') + '欄位'
+        });
+    }
+});
+
+/* 批准預約 */
+router.put('/reservation/:department/:space/', function(req, res) {
+    let requestObject = req.body;
+    let department = req.params.department;
+    let space = req.params.space;
+    let verify_fields = ["keys"];
+    let lack_fields = [];
+    for(let key in verify_fields) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
+            lack_fields.push(verify_fields[key]);
+        }
+    }
+    if(lack_fields.length == 0) {
+        let keys = requestObject.keys;
+        let responseObject = {};
+        let promises = [];
+        ref = req.database.ref('/itemReservation/' + department + '/' + space);
+        ref.once('value').then(function(snapshot) {
+            let reservationObject = snapshot.val();
+            if(reservationObject) {
+                for(let date in reservationObject) {
+                    for(let key in reservationObject[date]) {
+                        for(let index in keys) {
+                            if(keys[index] == key) {
+                                promises.push(new Promise((resolve, reject) => {
+                                    ref.child(date).child(keys[index]).child('state').set("已核准").then(()=>{
+                                        responseObject[keys[index]] = "已核准"
+                                        resolve();
+                                    });
+                                }));
+                            }
+                        }
+                    }
+                }
+                Promise.all(promises).then(() => {
+                    res.status(200).send(responseObject);
+                });
+            } else {
+                res.status(404).send({"message": "該院無預約資料"});
+            }
+        });
+    } else {
+    res.status(403).send({
+        "message": '缺少' + lack_fields.join(', ') + '欄位'
+    });
+}
+});
+
+/* 刪除預約 */
+router.delete('/reservation/:department/:space/:key', function(req, res) {
+    let key = req.params.key;
+    let department = req.params.department;
+    let space = req.params.space;
+    let requestObject = req.body;
+    let verify_fields = ["deleteRepeat"];
+    let lack_fields = [];
+    for(let key in verify_fields) {
+        if(!(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key]))) {
+            lack_fields.push(verify_fields[key]);
+        }
+    }
+    if(lack_fields.length == 0) {
+        let childID = undefined;
+        let find = false;
+        ref = req.database.ref('/itemReservation/' + department + '/' + space + '/');
+        ref.once('value').then(function(snapshot) {
+            let spaceReservation = snapshot.val();
+            for(let date in spaceReservation) {
+                for(let self_key in spaceReservation[date]) {
+                    if(self_key == key) {
+                        find = true;
+                        ref.child(date).child(self_key).remove();
+                        if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
+                            childID = spaceReservation[date][self_key]['child'];
+                        }
+                    }
+                }
+            }
+            if(find == false) {
+                res.status(404).send({
+                    "message": "找不到該筆預約資料"
+                });
+                return;
+            }
+            if(requestObject.deleteRepeat == 'true' && childID != undefined) {
+                while(childID != undefined) {
+                    for(let date in spaceReservation) {
+                        for(let self_key in spaceReservation[date]) {
+                            if(self_key == childID) {
+                                ref.child(date).child(self_key).remove();
+                                if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
+                                    childID = spaceReservation[date][self_key]['child'];
+                                } else {
+                                    childID = undefined;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            res.status(200).send({
+                "message": "刪除成功"
+            });
+        });
+    } else {
+        res.status(403).send({
+            "message": '缺少' + lack_fields.join(', ') + '欄位'
+        });
+    }
+});
+
 /* 獲得全部物品預約資訊 */
 router.get('/reservation', function(req, res) {
     ref = req.database.ref('/reservation');
