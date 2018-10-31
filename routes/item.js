@@ -98,6 +98,15 @@ router.get('/reservation/:department', function(req, res) {
     });
 });
 
+/* 獲得全部物品預約資訊 */
+router.get('/reservation', function(req, res) {
+    ref = req.database.ref('/itemReservation');
+    ref.once('value').then(function(snapshot) {
+        let reservation = snapshot.val();
+        res.status(200).send(reservation);
+    });
+});
+
 /* 新增預約 */
 router.post('/reservation/admin/:department/:space', function(req, res) {
     let department = req.params.department;
@@ -672,16 +681,6 @@ router.delete('/reservation/:department/:space/:key', function(req, res) {
         });
     }
 });
-
-/* 獲得全部物品預約資訊 */
-router.get('/reservation', function(req, res) {
-    ref = req.database.ref('/itemReservation');
-    ref.once('value').then(function(snapshot) {
-        let reservation = snapshot.val();
-        res.status(200).send(reservation);
-    });
-});
-
 
 /* 物品新增刪除修改 */
 
