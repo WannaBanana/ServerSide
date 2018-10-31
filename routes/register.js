@@ -136,7 +136,7 @@ router.patch('/:sid', function(req, res) {
                         if(Object.prototype.hasOwnProperty.call(requestObject, verify_fields[key])) {
                             studentObject[verify_fields[key]] = requestObject[verify_fields[key]];
                         }
-                        if(Object.prototype.hasOwnProperty.call(requestObject, 'newpassword') && requestObject.newpassword !="") {
+                        if(Object.prototype.hasOwnProperty.call(requestObject, 'newpassword') && requestObject.newpassword != "") {
                             studentObject['password'] = crypto.createHmac('sha256', secret.salt).update(requestObject.newpassword).digest('hex');
                         }
                     }
