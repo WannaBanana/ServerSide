@@ -51,8 +51,6 @@ router.post('/notify', function (req, res) {
             }
         }
         Promise.all(promises).then(()=>{
-            // console.log("send");
-            // console.log(userGroup);
             bot.multicast(userGroup, message);
         });
     });
@@ -436,6 +434,7 @@ bot.on('postback', function (event) {
                 case 'control':
                     var depCode = temp[1][0];
                     var space = temp[1].replace(temp[1][0], '');
+                    var method = temp[2];
                     switch(depCode){
                         case '管':
                             depCode = '管理學院';
@@ -448,6 +447,145 @@ bot.on('postback', function (event) {
                             break;
                         case '教':
                             depCode = '教育學院';
+                            break;
+                    }
+                    switch(method) {
+                        case 'photo':
+                            break;
+                        case 'state':
+                            ref = database.ref('/space/' + depCode + '/' + space);
+                            ref.once("value").then(function(snapshot) {
+                                let spaceObject = snapshot.val();
+                                if(snapshot) {
+                                    event.reply({
+                                        "type": "flex",
+                                        "altText": "請使用手機接收本訊息",
+                                        "contents": {
+                                            "type": "bubble",
+                                            "header": {
+                                            "type": "box",
+                                            "layout": "horizontal",
+                                            "contents": [
+                                                {
+                                                "type": "text",
+                                                "text": depCode + " " + space,
+                                                "size": "xl",
+                                                "align": "end",
+                                                "weight": "bold",
+                                                "color": "#000000"
+                                                }
+                                            ]
+                                            },
+                                            "hero": {
+                                            "type": "image",
+                                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_4_news.png",
+                                            "size": "full",
+                                            "aspectRatio": "20:13",
+                                            "aspectMode": "cover"
+                                            },
+                                            "body": {
+                                            "type": "box",
+                                            "layout": "horizontal",
+                                            "spacing": "md",
+                                            "contents": [
+                                                {
+                                                "type": "box",
+                                                "layout": "vertical",
+                                                "flex": 2,
+                                                "contents": [
+                                                    {
+                                                    "type": "text",
+                                                    "text": (spaceObject.service) == "啟動" ? "系統運作中" : "系統離線中",
+                                                    "align": "end",
+                                                    "weight": "bold"
+                                                    },
+                                                    {
+                                                    "type": "text",
+                                                    "text": "電子鎖狀態"
+                                                    },
+                                                    {
+                                                    "type": "text",
+                                                    "text": spaceObject.equipment.doorLock.power,
+                                                    "flex": 1,
+                                                    "size": "xs",
+                                                    "gravity": "top"
+                                                    },
+                                                    {
+                                                    "type": "separator",
+                                                    "margin": "md"
+                                                    },
+                                                    {
+                                                    "type": "text",
+                                                    "text": "門內感應器"
+                                                    },
+                                                    {
+                                                    "type": "text",
+                                                    "text": (spaceObject.equipment.doorLock.door) == "開啟" ? "門未上鎖" : "門已上鎖",
+                                                    "flex": 2,
+                                                    "size": "xs",
+                                                    "gravity": "center"
+                                                    },
+                                                    {
+                                                    "type": "separator",
+                                                    "margin": "md"
+                                                    },
+                                                    {
+                                                    "type": "text",
+                                                    "text": "RFID狀態"
+                                                    },
+                                                    {
+                                                    "type": "text",
+                                                    "text": spaceObject.equipment.rfid.state,
+                                                    "flex": 2,
+                                                    "size": "xs",
+                                                    "gravity": "center"
+                                                    },
+                                                    {
+                                                    "type": "separator",
+                                                    "margin": "md"
+                                                    },
+                                                    {
+                                                    "type": "text",
+                                                    "text": "玻璃破碎感應器狀態"
+                                                    },
+                                                    {
+                                                    "type": "text",
+                                                    "text": spaceObject.equipment.glassDetect.power,
+                                                    "flex": 1,
+                                                    "size": "xs",
+                                                    "gravity": "bottom"
+                                                    }
+                                                ]
+                                                }
+                                            ]
+                                            },
+                                            "footer": {
+                                            "type": "box",
+                                            "layout": "horizontal",
+                                            "contents": [
+                                                {
+                                                "type": "button",
+                                                "action": {
+                                                    "type": "postback",
+                                                    "label": "查看教室",
+                                                    "data": "control&" + temp[1] + "&photo"
+                                                }
+                                                }
+                                            ]
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "找不到該空間動態"
+                                    });
+                                }
+                            });
+                            break;
+                        case 'open':
+                            break;
+                        case 'close':
                             break;
                     }
                     break;
