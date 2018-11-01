@@ -515,6 +515,21 @@ bot.on('postback', function (event) {
                                                     "margin": "md"
                                                     },
                                                     {
+                                                        "type": "text",
+                                                        "text": "電控狀態"
+                                                        },
+                                                        {
+                                                        "type": "text",
+                                                        "text": spaceObject.equipment.doorLock.lock,
+                                                        "flex": 1,
+                                                        "size": "xs",
+                                                        "gravity": "top"
+                                                        },
+                                                        {
+                                                        "type": "separator",
+                                                        "margin": "md"
+                                                    },
+                                                    {
                                                     "type": "text",
                                                     "text": "門內感應器"
                                                     },
