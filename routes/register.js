@@ -65,7 +65,7 @@ router.post('/:sid', function(req, res) {
             }
         });
     } else {
-        res.status(403).send('缺少' + lack_fields.join(', ') + '欄位');
+        res.status(403).send({"message": '缺少' + lack_fields.join(', ') + '欄位'});
     }
 });
 
