@@ -169,9 +169,9 @@ router.patch('/verify/:sid', function(req, res) {
             ref.once('value').then(function(student_snapshot) {
                 let studentObject = student_snapshot.val();
                 studentObject.state = '已驗證';
-                ref.set(studentObject);
-                res.status(200).send({"message": "驗證成功"});
-                return;
+                ref.update(studentObject).then(()=>{
+                    res.status(200).send({"message": "驗證成功"});
+                });
             });
         } else {
             res.status(404).send({"message": "找不到該使用者"});
