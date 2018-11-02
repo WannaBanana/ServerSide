@@ -603,7 +603,7 @@ router.patch('/:department/:space/:key', function(req, res) {
 });
 
 /* 批准預約 */
-router.put('/:department/:space/', function(req, res) {
+router.put('/:department/:space', function(req, res) {
     let requestObject = req.body;
     let department = req.params.department;
     let space = req.params.space;
