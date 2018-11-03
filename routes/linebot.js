@@ -53,7 +53,7 @@ router.post('/notify', function (req, res) {
         }
         Promise.all(promises).then(()=>{
             bot.multicast(userGroup, message).then(() => {
-                res.status(404).send({"message": "Success send"});
+                res.status(200).send({"message": "Success send"});
             });
         });
     });
