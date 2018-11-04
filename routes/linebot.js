@@ -53,7 +53,7 @@ router.post('/notify', function (req, res) {
             res.status(404).send({"message": "No subscriber"});
         }
         Promise.all(promises).then(()=>{
-            bot.multicast(userGroup, JSON.parse(message)).then(() => {
+            bot.multicast(userGroup, message).then(() => {
                 res.status(200).send({"message": "Success send"});
             });
         });
