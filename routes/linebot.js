@@ -652,7 +652,7 @@ bot.on('postback', function (event) {
                                         { 'Content-Type': 'application/json' },
                                         body:
                                         {
-                                            method: 'open'
+                                            method: 'close'
                                         },
                                         json: true
                                     };
