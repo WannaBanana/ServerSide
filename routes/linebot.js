@@ -3,6 +3,7 @@ var router = express.Router();
 var linebot = require('linebot');
 var config = require('../ENV.json');
 var crypto = require('crypto');
+var request =require('request');
 const secret = require('../secret.json');
 
 var database = undefined;
@@ -602,8 +603,80 @@ bot.on('postback', function (event) {
                             });
                             break;
                         case 'open':
+                            ref = database.ref('/space/' + depCode + '/' + space);
+                            ref.once("value").then(function(snapshot) {
+                                let spaceObject = snapshot.val();
+                                if(spaceObject) {
+                                    let ipAddr = spaceObject.address;
+                                    var options = { method: 'POST',
+                                        url: 'http://' + ipAddr + ':3000/door',
+                                        headers:
+                                        { 'Content-Type': 'application/json' },
+                                        body:
+                                        {
+                                            method: 'open'
+                                        },
+                                        json: true
+                                    };
+
+                                    request(options, function (error, response, body) {
+                                        if (error) {
+                                            event.reply({
+                                                "type": "text",
+                                                "text": "開啟失敗"
+                                            });
+                                            throw new Error(error);
+                                        }
+                                        event.reply({
+                                            "type": "text",
+                                            "text": depCode + space + ' 開門成功'
+                                        });
+                                    });
+                                } else {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "無法控制該空間"
+                                    });
+                                }
+                            });
                             break;
                         case 'close':
+                            ref = database.ref('/space/' + depCode + '/' + space);
+                            ref.once("value").then(function(snapshot) {
+                                let spaceObject = snapshot.val();
+                                if(spaceObject) {
+                                    let ipAddr = spaceObject.address;
+                                    var options = { method: 'POST',
+                                        url: 'http://' + ipAddr + ':3000/door',
+                                        headers:
+                                        { 'Content-Type': 'application/json' },
+                                        body:
+                                        {
+                                            method: 'open'
+                                        },
+                                        json: true
+                                    };
+
+                                    request(options, function (error, response, body) {
+                                        if (error) {
+                                            event.reply({
+                                                "type": "text",
+                                                "text": "關閉失敗"
+                                            });
+                                            throw new Error(error);
+                                        }
+                                        event.reply({
+                                            "type": "text",
+                                            "text": depCode + space + ' 關閉成功'
+                                        });
+                                    });
+                                } else {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "無法控制該空間"
+                                    });
+                                }
+                            });
                             break;
                     }
                     break;
