@@ -20,26 +20,26 @@ router.post('/notify', function (req, res) {
     let department = requestObject.department;
     let space = requestObject.space;
     let message = requestObject.message;
-    console.log(requestObject);
+    // console.log(requestObject);
     let ref = database.ref('/subscribe');
     let promises = [];
     let userGroup = [];
     ref.once("value").then(function(snapshot) {
         let subscribeObject = snapshot.val();
         if(subscribeObject) {
-            console.log(subscribeObject);
+            // console.log(subscribeObject);
             for(let user in subscribeObject) {
                 for(let dep in subscribeObject[user]) {
                     if(dep == department) {
-                        console.log(department);
+                        // console.log(department);
                         if(subscribeObject[user][department].indexOf(space) != -1) {
-                            console.log(space);
+                            // console.log(space);
                             ref = database.ref('/user/' + user + '/lineUserID');
                             promises.push(new Promise((resolve, reject) => {
                                 ref.once("value").then(function(lineData) {
                                     let lineID = lineData.val();
                                     if(lineID && lineID.length != 5) {
-                                        console.log(lineID);
+                                        // console.log(lineID);
                                         userGroup.push(lineID);
                                         resolve();
                                     }
@@ -99,10 +99,10 @@ bot.on('message', function (event) {
         ref.orderByChild('lineUserID').equalTo(event.source.userId).once("value", function(searchBindingSnapshot) {
             var searchBindingData = searchBindingSnapshot.val();
             if(searchBindingData) {
-                console.log('I find that user');
+                // console.log('I find that user');
                 user = Object.keys(searchBindingData)[0];
-                console.log('That user is: ' + user);
-                console.log('Message is: ' + message);
+                // console.log('That user is: ' + user);
+                // console.log('Message is: ' + message);
                 if(user) {
                     switch(message) {
                         case '選單':
@@ -267,7 +267,7 @@ bot.on('message', function (event) {
                     }
                 }
             } else {
-                console.log('I can not find that user');
+                // console.log('I can not find that user');
                 if(message == '帳號綁定') {
                     event.reply({
                         "type": "text",
@@ -282,7 +282,7 @@ bot.on('message', function (event) {
                         for(let usr in userData) {
                             if(userData[usr].lineUserID == userCode) {
                                 success = true;
-                                console.log(event.source.userId);
+                                // console.log(event.source.userId);
                                 ref.child(usr).child('lineUserID').set(event.source.userId).then(() => {
                                     event.reply({
                                         "type": "text",
@@ -316,9 +316,9 @@ bot.on('postback', function (event) {
     ref.orderByChild('lineUserID').equalTo(event.source.userId).once("value", function(searchBindingSnapshot) {
         var searchBindingData = searchBindingSnapshot.val();
         if(searchBindingData) {
-            console.log('I find that user');
+            // console.log('I find that user');
             user = Object.keys(searchBindingData)[0];
-            console.log('That user is: ' + user);
+            // console.log('That user is: ' + user);
             switch(temp[0]) {
                 case 'subscribe':
                     var depCode = temp[1][0];
@@ -603,12 +603,12 @@ bot.on('postback', function (event) {
                             });
                             break;
                         case 'open':
-                            console.log('open');
+                            // console.log('open');
                             ref = database.ref('/space/' + depCode + '/' + space);
                             ref.once("value").then(function(snapshot) {
                                 let spaceObject = snapshot.val();
                                 if(spaceObject) {
-                                    console.log('inner');
+                                    // console.log('inner');
                                     let ipAddr = spaceObject.address;
                                     var options = { method: 'POST',
                                         url: 'http://' + ipAddr + ':3000/door',
@@ -620,7 +620,7 @@ bot.on('postback', function (event) {
                                         },
                                         json: true
                                     };
-                                    console.log('send request');
+                                    // console.log('send request');
                                     request(options, function (error, response, body) {
                                         if (error) {
                                             event.reply({
