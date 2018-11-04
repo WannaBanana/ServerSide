@@ -603,10 +603,12 @@ bot.on('postback', function (event) {
                             });
                             break;
                         case 'open':
+                            console.log('open');
                             ref = database.ref('/space/' + depCode + '/' + space);
                             ref.once("value").then(function(snapshot) {
                                 let spaceObject = snapshot.val();
                                 if(spaceObject) {
+                                    console.log('inner');
                                     let ipAddr = spaceObject.address;
                                     var options = { method: 'POST',
                                         url: 'http://' + ipAddr + ':3000/door',
@@ -618,12 +620,12 @@ bot.on('postback', function (event) {
                                         },
                                         json: true
                                     };
-
+                                    console.log('send request');
                                     request(options, function (error, response, body) {
                                         if (error) {
                                             event.reply({
                                                 "type": "text",
-                                                "text": "開啟失敗"
+                                                "text": depCode + space + ' 開門成功'
                                             });
                                             throw new Error(error);
                                         }
@@ -661,7 +663,7 @@ bot.on('postback', function (event) {
                                         if (error) {
                                             event.reply({
                                                 "type": "text",
-                                                "text": "關閉失敗"
+                                                "text": depCode + space + ' 關閉失敗'
                                             });
                                             throw new Error(error);
                                         }
