@@ -422,7 +422,7 @@ bot.on('postback', function (event) {
                                 {
                                     "type": "postback",
                                     "label": "開門",
-                                    "data": "control&" + temp[1] + "open"
+                                    "data": "control&" + temp[1] + "&open"
                                 },
                                 {
                                     "type": "postback",
