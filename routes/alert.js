@@ -24,7 +24,7 @@ router.get('/', function(req, res) {
             }
             responseObject[department][space][date][key] = alertObject[key];
         }
-        res.status.send(responseObject);
+        res.status(200).send(responseObject);
     });
 });
 
