@@ -681,14 +681,15 @@ bot.on('postback', function (event) {
                                 let alertObject = snapshot.val();
                                 if(alertObject) {
                                     ref.child('state').set('已處理');
+                                    console.log('更新');
                                     let source = alertObject.source;
                                     let department = source.slice(0,4);
                                     let space = source.slice(4);
+                                    console.log(department, space);
                                     let message = {
                                         "type": "text",
                                         "text": "[" + department + " " + space + ":" + snapshot.key +"] 已處理"
                                     };;
-                                    // console.log(requestObject);
                                     let ref = database.ref('/subscribe');
                                     let promises = [];
                                     let userGroup = [];
@@ -699,15 +700,15 @@ bot.on('postback', function (event) {
                                             for(let user in subscribeObject) {
                                                 for(let dep in subscribeObject[user]) {
                                                     if(dep == department) {
-                                                        // console.log(department);
+                                                        console.log(department);
                                                         if(subscribeObject[user][department].indexOf(space) != -1) {
-                                                            // console.log(space);
+                                                            console.log(space);
                                                             ref = database.ref('/user/' + user + '/lineUserID');
                                                             promises.push(new Promise((resolve, reject) => {
                                                                 ref.once("value").then(function(lineData) {
                                                                     let lineID = lineData.val();
                                                                     if(lineID && lineID.length != 5) {
-                                                                        // console.log(lineID);
+                                                                        console.log(lineID);
                                                                         userGroup.push(lineID);
                                                                         resolve();
                                                                     }
