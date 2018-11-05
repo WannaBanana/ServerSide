@@ -618,6 +618,7 @@ router.put('/:department/:space', function(req, res) {
         let keys = requestObject.keys;
         let responseObject = {};
         let promises = [];
+        let user = undefined;
         ref = req.database.ref('/reservation/' + department + '/' + space);
         ref.once('value').then(function(snapshot) {
             let reservationObject = snapshot.val();
@@ -626,9 +627,19 @@ router.put('/:department/:space', function(req, res) {
                     for(let key in reservationObject[date]) {
                         for(let index in keys) {
                             if(keys[index] == key) {
+                                user = reservationObject[date][key].name;
                                 promises.push(new Promise((resolve, reject) => {
                                     ref.child(date).child(keys[index]).child('state').set("已核准").then(()=>{
                                         responseObject[keys[index]] = "已核准"
+                                    }).then(()=>{
+                                        notify_ref = req.database.ref('/notify/' + user);
+                                        notify_ref.push({
+                                            "type": "教室預約",
+                                            "department": department,
+                                            "space": space,
+                                            "key": keys[index],
+                                            "state": "通過審核"
+                                        });
                                         resolve();
                                     });
                                 }));
@@ -674,6 +685,14 @@ router.delete('/:department/:space/:key', function(req, res) {
                     if(self_key == key) {
                         find = true;
                         ref.child(date).child(self_key).remove();
+                        notify_ref = req.database.ref('/notify/' + user);
+                        notify_ref.push({
+                            "type": "教室預約",
+                            "department": department,
+                            "space": space,
+                            "key": self_key,
+                            "state": "通過審核"
+                        });
                         if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
                             childID = spaceReservation[date][self_key]['child'];
                         }
@@ -691,7 +710,16 @@ router.delete('/:department/:space/:key', function(req, res) {
                     for(let date in spaceReservation) {
                         for(let self_key in spaceReservation[date]) {
                             if(self_key == childID) {
+                                let user = spaceReservation[date][self].name;
                                 ref.child(date).child(self_key).remove();
+                                notify_ref = req.database.ref('/notify/' + user);
+                                notify_ref.push({
+                                    "type": "教室預約",
+                                    "department": department,
+                                    "space": space,
+                                    "key": self_key,
+                                    "state": "通過審核"
+                                });
                                 if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
                                     childID = spaceReservation[date][self_key]['child'];
                                 } else {
