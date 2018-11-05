@@ -691,7 +691,7 @@ router.delete('/:department/:space/:key', function(req, res) {
                             "department": department,
                             "space": space,
                             "key": self_key,
-                            "state": "通過審核"
+                            "state": "未通過審核"
                         });
                         if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
                             childID = spaceReservation[date][self_key]['child'];
@@ -718,7 +718,7 @@ router.delete('/:department/:space/:key', function(req, res) {
                                     "department": department,
                                     "space": space,
                                     "key": self_key,
-                                    "state": "通過審核"
+                                    "state": "未通過審核"
                                 });
                                 if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
                                     childID = spaceReservation[date][self_key]['child'];
