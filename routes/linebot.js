@@ -626,14 +626,10 @@ bot.on('postback', function (event) {
                                         if (error) {
                                             event.reply({
                                                 "type": "text",
-                                                "text": depCode + space + ' 開門成功'
+                                                "text": depCode + space + ' 開門失敗'
                                             });
                                             throw new Error(error);
                                         }
-                                        event.reply({
-                                            "type": "text",
-                                            "text": depCode + space + ' 開門成功'
-                                        });
                                     });
                                 } else {
                                     event.reply({
@@ -668,10 +664,6 @@ bot.on('postback', function (event) {
                                             });
                                             throw new Error(error);
                                         }
-                                        event.reply({
-                                            "type": "text",
-                                            "text": depCode + space + ' 關閉成功'
-                                        });
                                     });
                                 } else {
                                     event.reply({
