@@ -632,7 +632,8 @@ router.put('/:department/:space', function(req, res) {
                                     ref.child(date).child(keys[index]).child('state').set("已核准").then(()=>{
                                         responseObject[keys[index]] = "已核准"
                                     }).then(()=>{
-                                        notify_ref = req.database.ref('/notify/' + user);
+                                        let date = new Date().toISOString().slice(0, 10);
+                                        notify_ref = req.database.ref('/notify/' + user + '/' + date);
                                         notify_ref.push({
                                             "type": "教室預約",
                                             "department": department,
@@ -685,7 +686,8 @@ router.delete('/:department/:space/:key', function(req, res) {
                     if(self_key == key) {
                         find = true;
                         ref.child(date).child(self_key).remove();
-                        notify_ref = req.database.ref('/notify/' + user);
+                        let date = new Date().toISOString().slice(0, 10);
+                        notify_ref = req.database.ref('/notify/' + user + '/' + date);
                         notify_ref.push({
                             "type": "教室預約",
                             "department": department,
@@ -712,7 +714,8 @@ router.delete('/:department/:space/:key', function(req, res) {
                             if(self_key == childID) {
                                 let user = spaceReservation[date][self].name;
                                 ref.child(date).child(self_key).remove();
-                                notify_ref = req.database.ref('/notify/' + user);
+                                let date = new Date().toISOString().slice(0, 10);
+                                notify_ref = req.database.ref('/notify/' + user + '/' + date);
                                 notify_ref.push({
                                     "type": "教室預約",
                                     "department": department,
