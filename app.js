@@ -21,6 +21,7 @@ var linebot = require('./routes/linebot');
 var alert = require('./routes/alert');
 var item = require('./routes/item');
 var permission = require('./routes/permission');
+var notify = require('./routes/notify');
 
 var app = express();
 app.use(cors());
@@ -80,6 +81,7 @@ app.use('/api/linebot', linebot);
 app.use('/api/alert', alert);
 app.use('/api/item', item);
 app.use('/api/permission', permission);
+app.use('/api/notify', notify);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
