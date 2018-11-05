@@ -675,6 +675,59 @@ bot.on('postback', function (event) {
                             break;
                         case 'report':
                             let key = temp[1];
+                            console.log(key);
+                            ref = database.ref('/alert/' + key);
+                            ref.once("value").then(function(snapshot) {
+                                let alertObject = snapshot.val();
+                                if(alertObject) {
+                                    ref.child('state').set('已處理');
+                                    let source = alertObject.source;
+                                    let department = source.slice(0,4);
+                                    let space = source.slice(4);
+                                    let message = {
+                                        "type": "text",
+                                        "text": "[" + department + " " + space + ":" + snapshot.key +"] 已處理"
+                                    };;
+                                    // console.log(requestObject);
+                                    let ref = database.ref('/subscribe');
+                                    let promises = [];
+                                    let userGroup = [];
+                                    ref.once("value").then(function(snapshot) {
+                                        let subscribeObject = snapshot.val();
+                                        if(subscribeObject) {
+                                            // console.log(subscribeObject);
+                                            for(let user in subscribeObject) {
+                                                for(let dep in subscribeObject[user]) {
+                                                    if(dep == department) {
+                                                        // console.log(department);
+                                                        if(subscribeObject[user][department].indexOf(space) != -1) {
+                                                            // console.log(space);
+                                                            ref = database.ref('/user/' + user + '/lineUserID');
+                                                            promises.push(new Promise((resolve, reject) => {
+                                                                ref.once("value").then(function(lineData) {
+                                                                    let lineID = lineData.val();
+                                                                    if(lineID && lineID.length != 5) {
+                                                                        // console.log(lineID);
+                                                                        userGroup.push(lineID);
+                                                                        resolve();
+                                                                    }
+                                                                });
+                                                            }));
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            res.status(404).send({"message": "No subscriber"});
+                                        }
+                                        Promise.all(promises).then(()=>{
+                                            bot.multicast(userGroup, message).then(() => {
+                                                res.status(200).send({"message": "Success send"});
+                                            });
+                                        });
+                                    });
+                                }
+                            });
                             break;
                     }
                     break;
