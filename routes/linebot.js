@@ -172,7 +172,7 @@ bot.on('message', function (event) {
                             });
                             break;
                         case '取消訂閱':
-                            ref = database.ref('/subscribe/' + user + '/space');
+                            ref = database.ref('/subscribe/' + user);
                             ref.once("value").then(function(snapshot) {
                                 let subscribeObject = snapshot.val();
                                 let button = [];
@@ -382,11 +382,11 @@ bot.on('postback', function (event) {
                             break;
                     }
                     ref = database.ref('/subscribe/' + user + '/' + depCode);
-                    console.log(depCode, space, user);
+                    // console.log(depCode, space, user);
                     ref.once("value").then(function(snapshot) {
                         let subscribeObject = snapshot.val();
                         if(subscribeObject) {
-                            console.log(subscribeObject);
+                            // console.log(subscribeObject);
                             if(subscribeObject.indexOf(space) != -1) {
                                 subscribeObject.splice(subscribeObject.indexOf(space), 1);
                                 ref.set(subscribeObject).then(function() {
@@ -677,17 +677,17 @@ bot.on('postback', function (event) {
                             break;
                         case 'report':
                             let key = temp[1];
-                            console.log(key);
+                            // console.log(key);
                             ref = database.ref('/alert/' + key);
                             ref.once("value").then(function(snapshot) {
                                 let alertObject = snapshot.val();
                                 if(alertObject) {
                                     ref.child('state').set('已處理');
-                                    console.log('更新');
+                                    // console.log('更新');
                                     let source = alertObject.source;
                                     let department = source.slice(0,4);
                                     let space = source.slice(4);
-                                    console.log(department, space);
+                                    // console.log(department, space);
                                     let message = {
                                         "type": "text",
                                         "text": "[" + department + " " + space + ":" + snapshot.key +"] 已處理"
@@ -702,15 +702,15 @@ bot.on('postback', function (event) {
                                             for(let user in subscribeObject) {
                                                 for(let dep in subscribeObject[user]) {
                                                     if(dep == department) {
-                                                        console.log(department);
+                                                        // console.log(department);
                                                         if(subscribeObject[user][department].indexOf(space) != -1) {
-                                                            console.log(space);
+                                                            // console.log(space);
                                                             ref = database.ref('/user/' + user + '/lineUserID');
                                                             promises.push(new Promise((resolve, reject) => {
                                                                 ref.once("value").then(function(lineData) {
                                                                     let lineID = lineData.val();
                                                                     if(lineID && lineID.length != 5) {
-                                                                        console.log(lineID);
+                                                                        // console.log(lineID);
                                                                         userGroup.push(lineID);
                                                                         resolve();
                                                                     }
