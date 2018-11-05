@@ -382,9 +382,11 @@ bot.on('postback', function (event) {
                             break;
                     }
                     ref = database.ref('/subscribe/' + user + '/' + depCode);
+                    console.log(depCode, space, user);
                     ref.once("value").then(function(snapshot) {
                         let subscribeObject = snapshot.val();
                         if(subscribeObject) {
+                            console.log(subscribeObject);
                             if(subscribeObject.indexOf(space) != -1) {
                                 subscribeObject.splice(subscribeObject.indexOf(space), 1);
                                 ref.set(subscribeObject).then(function() {
