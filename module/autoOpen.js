@@ -21,76 +21,78 @@ module.exports = function (database) {
                         if(reservationObject[department][space][date]) {
                             console.log('有預約');
                             for(let key in reservationObject[department][space][date]) {
-                                console.log(department, space, date, key, alreadyOpen);
-                                if(alreadyOpen.indexOf(key) != -1) {
-                                    console.log('有已經開啟的');
-                                    if(new Date() > new Date(reservationObject[department][space][date][key].end)) {
-                                        console.log('已過期');
-                                        // 獲取 ip
-                                        space_ref = database.ref('/space/' + department + '/' + space);
-                                        space_ref.once("value").then(function(snapshot) {
-                                            let spaceObject = snapshot.val();
-                                            if(spaceObject && spaceObject.address) {
-                                                // 發送關門
-                                                var options = {
-                                                    method: 'POST',
-                                                    url: 'http://' + spaceObject.address + ':3000/door',
-                                                    headers:
-                                                    { 'Content-Type': 'application/json' },
-                                                    body:
-                                                    {
-                                                        method: 'close'
-                                                    },
-                                                    json: true
-                                                };
-
-                                                request(options, function (error, response, body) {
-                                                    if (error) {
-                                                        throw new Error(error);
-                                                    } else {
-                                                        // 陣列移除
-                                                        alreadyOpen.splice(alreadyOpen.indexOf(key), 1);
-                                                    }
-                                                });
-                                            } else {
-                                                console.log('查無空間');
-                                            }
-                                        });
-                                    }
-                                } else {
-                                    if(new Date() > new Date(reservationObject[department][space][date][key].start) && new Date() < new Date(reservationObject[department][space][date][key].end)) {
-                                        console.log('已開始');
-                                        space_ref = database.ref('/space/' + department + '/' + space);
-                                        space_ref.once("value").then(function(snapshot) {
-                                            let spaceObject = snapshot.val();
-                                            if(spaceObject && spaceObject.address) {
-                                                // 發送開門
-                                                var options = {
-                                                    method: 'POST',
-                                                    url: 'http://' + spaceObject.address + ':3000/door',
-                                                    headers:
-                                                    { 'Content-Type': 'application/json' },
-                                                    body:
-                                                    {
-                                                        method: 'open'
-                                                    },
-                                                    json: true
-                                                };
-
-                                                request(options, function (error, response, body) {
-                                                    if (error) {
-                                                        throw new Error(error);
-                                                    } else {
-                                                        // 陣列新增
-                                                        alreadyOpen.push(key);
-                                                    }
-                                                });
-                                            } else {
-                                                console.log('查無空間');
-                                            }
-                                        });
+                                if(reservationObject[department][space][date][key].state == '已核准') {
+                                    console.log(department, space, date, key, alreadyOpen);
+                                    if(alreadyOpen.indexOf(key) != -1) {
+                                        console.log('有已經開啟的');
+                                        if(new Date() > new Date(reservationObject[department][space][date][key].end)) {
+                                            console.log('已過期');
+                                            // 獲取 ip
+                                            space_ref = database.ref('/space/' + department + '/' + space);
+                                            space_ref.once("value").then(function(snapshot) {
+                                                let spaceObject = snapshot.val();
+                                                if(spaceObject && spaceObject.address) {
+                                                    // 發送關門
+                                                    var options = {
+                                                        method: 'POST',
+                                                        url: 'http://' + spaceObject.address + ':3000/door',
+                                                        headers:
+                                                        { 'Content-Type': 'application/json' },
+                                                        body:
+                                                        {
+                                                            method: 'close'
+                                                        },
+                                                        json: true
+                                                    };
+    
+                                                    request(options, function (error, response, body) {
+                                                        if (error) {
+                                                            throw new Error(error);
+                                                        } else {
+                                                            // 陣列移除
+                                                            alreadyOpen.splice(alreadyOpen.indexOf(key), 1);
+                                                        }
+                                                    });
+                                                } else {
+                                                    console.log('查無空間');
+                                                }
+                                            });
+                                        }
                                     } else {
-                                        console.log('已過期');
+                                        if(new Date() > new Date(reservationObject[department][space][date][key].start) && new Date() < new Date(reservationObject[department][space][date][key].end)) {
+                                            console.log('已開始');
+                                            space_ref = database.ref('/space/' + department + '/' + space);
+                                            space_ref.once("value").then(function(snapshot) {
+                                                let spaceObject = snapshot.val();
+                                                if(spaceObject && spaceObject.address) {
+                                                    // 發送開門
+                                                    var options = {
+                                                        method: 'POST',
+                                                        url: 'http://' + spaceObject.address + ':3000/door',
+                                                        headers:
+                                                        { 'Content-Type': 'application/json' },
+                                                        body:
+                                                        {
+                                                            method: 'open'
+                                                        },
+                                                        json: true
+                                                    };
+    
+                                                    request(options, function (error, response, body) {
+                                                        if (error) {
+                                                            throw new Error(error);
+                                                        } else {
+                                                            // 陣列新增
+                                                            alreadyOpen.push(key);
+                                                        }
+                                                    });
+                                                } else {
+                                                    console.log('查無空間');
+                                                }
+                                            });
+                                        } else {
+                                            console.log('已過期');
+                                        }
                                     }
                                 }
                             }
