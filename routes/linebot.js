@@ -271,11 +271,11 @@ bot.on('message', function (event) {
                             }
                             let key = message.split("&")[1];
                             console.log(key);
-                            ref = database.ref('/alert/' + key);
-                            ref.once("value").then(function(snapshot) {
+                            let alert_ref = database.ref('/alert/' + key);
+                            alert_ref.once("value").then(function(snapshot) {
                                 let alertObject = snapshot.val();
                                 if(alertObject) {
-                                    ref.child('state').set('已處理');
+                                    alert_ref.child('state').set('已處理');
                                     console.log('更新');
                                     let source = alertObject.source;
                                     let department = source.slice(0,4);
@@ -285,10 +285,10 @@ bot.on('message', function (event) {
                                         "type": "text",
                                         "text": "[" + department + " " + space + ":" + snapshot.key +"] 已處理"
                                     };;
-                                    let ref = database.ref('/subscribe');
+                                    let sub_ref = database.ref('/subscribe');
                                     let promises = [];
                                     let userGroup = [];
-                                    ref.once("value").then(function(snapshot) {
+                                    sub_ref.once("value").then(function(snapshot) {
                                         let subscribeObject = snapshot.val();
                                         if(subscribeObject) {
                                             console.log(subscribeObject);
@@ -298,9 +298,9 @@ bot.on('message', function (event) {
                                                         console.log(department);
                                                         if(subscribeObject[user][department].indexOf(space) != -1) {
                                                             console.log(space);
-                                                            ref = database.ref('/user/' + user + '/lineUserID');
+                                                            let user_ref = database.ref('/user/' + user + '/lineUserID');
                                                             promises.push(new Promise((resolve, reject) => {
-                                                                ref.once("value").then(function(lineData) {
+                                                                user_ref.once("value").then(function(lineData) {
                                                                     let lineID = lineData.val();
                                                                     if(lineID && lineID.length != 5) {
                                                                         console.log(lineID);
