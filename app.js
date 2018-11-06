@@ -60,9 +60,10 @@ app.use(logger('dev'));
 app.use(bodyParser.json({
     verify: function (req, res, buf, encoding) {
         req.rawBody = buf.toString(encoding);
-    }
+    },
+    limit: "50mb"
 }));
-app.use(bodyParser.urlencoded({"extended": false}));
+app.use(bodyParser.urlencoded({"extended": false, "limit": "50mb"}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(helmet());
