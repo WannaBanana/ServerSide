@@ -64,7 +64,7 @@ module.exports = function (database) {
                                         space_ref.once("value").then(function(snapshot) {
                                             let spaceObject = snapshot.val();
                                             if(spaceObject && spaceObject.address) {
-                                                // 發送關門
+                                                // 發送開門
                                                 var options = {
                                                     method: 'POST',
                                                     url: 'http://' + spaceObject.address + ':3000/door',
@@ -81,8 +81,8 @@ module.exports = function (database) {
                                                     if (error) {
                                                         throw new Error(error);
                                                     } else {
-                                                        // 陣列移除
-                                                        alreadyOpen.splice(alreadyOpen.indexOf(key), 1);
+                                                        // 陣列新增
+                                                        alreadyOpen.push(key);
                                                     }
                                                 });
                                             } else {
@@ -104,7 +104,7 @@ module.exports = function (database) {
     }
 
     module.init = function () {
-        timer = setInterval(_check, 60000);
+        timer = setInterval(_check, 30000);
     };
 
     module.destory = function () {
