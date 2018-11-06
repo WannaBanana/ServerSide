@@ -695,8 +695,8 @@ router.delete('/:department/:space/:key', function(req, res) {
                             "key": self_key,
                             "state": "未通過審核"
                         });
-                        if(Object.prototype.hasOwnProperty.call(spaceReservation[current_date][self_key], 'child')) {
-                            childID = spaceReservation[current_date][self_key]['child'];
+                        if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
+                            childID = spaceReservation[date][self_key]['child'];
                         }
                     }
                 }
