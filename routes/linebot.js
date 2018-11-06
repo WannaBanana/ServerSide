@@ -485,7 +485,7 @@ bot.on('postback', function (event) {
                                             },
                                             "hero": {
                                             "type": "image",
-                                            "url": "https://www.cte.ncnu.edu.tw/UserFiles/數位多媒體設計暨數位多媒體微觀教室.JPG",
+                                            "url": "https://d2r72yk5wmppdj.cloudfront.net/m/3ced976c1b910852/Low-Classroom_Traditional_Introduction-Banner.jpg",
                                             "size": "full",
                                             "aspectRatio": "20:13",
                                             "aspectMode": "cover"
