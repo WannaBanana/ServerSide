@@ -58,29 +58,39 @@ module.exports = function (database) {
                                         });
                                     }
                                 } else {
-                                    if(new Date() > new Date(reservationObject[department][space][date][key].start)) {
+                                    if(new Date() > new Date(reservationObject[department][space][date][key].start) && new Date() < new Date(reservationObject[department][space][date][key].end)) {
                                         console.log('已開始');
-                                        // 發送開門
-                                        var options = {
-                                            method: 'POST',
-                                            url: 'http://' + spaceObject.address + ':3000/door',
-                                            headers:
-                                            { 'Content-Type': 'application/json' },
-                                            body:
-                                            {
-                                                method: 'open'
-                                            },
-                                            json: true
-                                        };
+                                        space_ref = database.ref('/space/' + department + '/' + space);
+                                        space_ref.once("value").then(function(snapshot) {
+                                            let spaceObject = snapshot.val();
+                                            if(spaceObject && spaceObject.address) {
+                                                // 發送關門
+                                                var options = {
+                                                    method: 'POST',
+                                                    url: 'http://' + spaceObject.address + ':3000/door',
+                                                    headers:
+                                                    { 'Content-Type': 'application/json' },
+                                                    body:
+                                                    {
+                                                        method: 'open'
+                                                    },
+                                                    json: true
+                                                };
 
-                                        request(options, function (error, response, body) {
-                                            if (error) {
-                                                throw new Error(error);
+                                                request(options, function (error, response, body) {
+                                                    if (error) {
+                                                        throw new Error(error);
+                                                    } else {
+                                                        // 陣列移除
+                                                        alreadyOpen.splice(alreadyOpen.indexOf(key), 1);
+                                                    }
+                                                });
                                             } else {
-                                                // 推入陣列
-                                                alreadyOpen.push(key);
+                                                console.log('查無空間');
                                             }
                                         });
+                                    } else {
+                                        console.log('已過期');
                                     }
                                 }
                             }
