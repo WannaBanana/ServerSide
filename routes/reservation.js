@@ -685,15 +685,16 @@ router.delete('/:department/:space/:key', function(req, res) {
                 for(let self_key in spaceReservation[date]) {
                     if(self_key == key) {
                         find = true;
-                        ref.child(date).child(self_key).remove();
                         let current_date = new Date().toISOString().slice(0, 10);
-                        notify_ref = req.database.ref('/notify/' + user + '/' + current_date);
+                        notify_ref = req.database.ref('/notify/' + spaceReservation[date][key].name + '/' + current_date);
                         notify_ref.push({
                             "type": "教室預約",
                             "department": department,
                             "space": space,
                             "key": self_key,
                             "state": "未通過審核"
+                        }).then(()=>{
+                            ref.child(date).child(self_key).remove();
                         });
                         if(Object.prototype.hasOwnProperty.call(spaceReservation[date][self_key], 'child')) {
                             childID = spaceReservation[date][self_key]['child'];
