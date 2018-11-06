@@ -691,7 +691,7 @@ router.delete('/:department/:space/:key', function(req, res) {
                             "type": "教室預約",
                             "department": department,
                             "space": space,
-                            "key": self_key,
+                            "reservation": spaceReservation[date][key],
                             "state": "未通過審核"
                         }).then(()=>{
                             ref.child(date).child(self_key).remove();
