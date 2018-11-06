@@ -283,7 +283,7 @@ bot.on('message', function (event) {
                                     console.log(department, space);
                                     let message = {
                                         "type": "text",
-                                        "text": "[" + department + " " + space + ":" + snapshot.key +"] 已處理"
+                                        "text": "[ " + department + " " + space + " ： (" + snapshot.key +") ] 事件已處理"
                                     };;
                                     let sub_ref = database.ref('/subscribe');
                                     let promises = [];
