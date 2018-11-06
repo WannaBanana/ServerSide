@@ -485,7 +485,7 @@ bot.on('postback', function (event) {
                                             },
                                             "hero": {
                                             "type": "image",
-                                            "url": "https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_4_news.png",
+                                            "url": "https://www.cte.ncnu.edu.tw/UserFiles/數位多媒體設計暨數位多媒體微觀教室.JPG",
                                             "size": "full",
                                             "aspectRatio": "20:13",
                                             "aspectMode": "cover"
