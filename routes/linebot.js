@@ -265,21 +265,22 @@ bot.on('message', function (event) {
                             });
                             break;
                         case '已處理':
+                            console.log('已處理');
                             if(message.split("&").length < 2) {
                                 return;
                             }
                             let key = message.split("&")[1];
-                            // console.log(key);
+                            console.log(key);
                             ref = database.ref('/alert/' + key);
                             ref.once("value").then(function(snapshot) {
                                 let alertObject = snapshot.val();
                                 if(alertObject) {
                                     ref.child('state').set('已處理');
-                                    // console.log('更新');
+                                    console.log('更新');
                                     let source = alertObject.source;
                                     let department = source.slice(0,4);
                                     let space = source.slice(4);
-                                    // console.log(department, space);
+                                    console.log(department, space);
                                     let message = {
                                         "type": "text",
                                         "text": "[" + department + " " + space + ":" + snapshot.key +"] 已處理"
