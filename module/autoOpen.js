@@ -15,7 +15,7 @@ module.exports = function (database) {
         ref.once("value").then(function(snapshot) {
             let reservationObject = snapshot.val();
             if(reservationObject) {
-                let date = new Date(alertObject[key].time).toISOString().slice(0, 10);
+                let date = new Date().toISOString().slice(0, 10);
                 for(let department in reservationObject) {
                     for(let space in reservationObject[department]) {
                         if(reservationObject[department][space][date]) {
