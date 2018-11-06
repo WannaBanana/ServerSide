@@ -93,18 +93,14 @@ module.exports = function (database) {
         });
     }
 
-    function init() {
+    module.init = function () {
         timer = setInterval(_check, 60000);
-    }
+    };
 
-    function destory() {
+    module.destory = function () {
         clearInterval(timer);
         timer = undefined;
-    }
-
-    module.init = init();
-
-    module.destory = destory();
+    };
 
     return module;
 };
