@@ -170,6 +170,12 @@ router.patch('/verify/:sid', function(req, res) {
                 let studentObject = student_snapshot.val();
                 studentObject.state = '已驗證';
                 ref.update(studentObject).then(()=>{
+                    let date = new Date().toISOString().slice(0, 10);
+                    let notify_ref = req.database.ref('/notify/' + user + '/' + date);
+                    notify_ref.push({
+                        "type": "帳號審核",
+                        "state": "通過審核"
+                    });
                     res.status(200).send({"message": "驗證成功"});
                 });
             });
