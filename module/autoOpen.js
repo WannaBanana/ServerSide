@@ -44,7 +44,6 @@ module.exports = function (database) {
                                                         },
                                                         json: true
                                                     };
-    
                                                     request(options, function (error, response, body) {
                                                         if (error) {
                                                             throw new Error(error);
@@ -91,7 +90,7 @@ module.exports = function (database) {
                                                 }
                                             });
                                         } else {
-                                            console.log('已過期');
+                                            console.log('尚未需處理');
                                         }
                                     }
                                 }
