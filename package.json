@@ -14,8 +14,10 @@
     "express": "^4.16.3",
     "firebase-admin": "^6.0.0",
     "helmet": "^3.13.0",
+    "image-to-base64": "^2.0.1",
     "linebot": "^1.4.1",
     "morgan": "~1.0.0",
+    "request": "^2.88.0",
     "static-favicon": "~1.0.0"
   }
 }
