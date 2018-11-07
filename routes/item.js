@@ -14,6 +14,12 @@ router.get('/book/:department', function(req, res) {
             for(let space in reservationObject) {
                 for(let date in reservationObject[space]) {
                     for(let key in reservationObject[space][date]) {
+                        if(!responseObject[space]) {
+                            responseObject[space] = {}
+                        }
+                        if(!responseObject[space][date]) {
+                            responseObject[space][date] = {};
+                        }
                         if(reservationObject[space][date][key].state == '未核准') {
                             responseObject[space] = {};
                             responseObject[space][date] = {};
