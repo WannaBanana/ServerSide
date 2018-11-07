@@ -16,7 +16,7 @@ router.get('/snapshot', function(req, res) {
             res.status(response.statusCode).send(response);
             throw new Error(error);
         }
-        res.status(response.statusCode).send(body);
+        res.status(response.statusCode).sendFile(body);
     });
 });
 
