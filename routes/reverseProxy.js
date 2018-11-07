@@ -8,7 +8,7 @@ router.get('/snapshot', function(req, res) {
     .then(
         (response) => {
             console.log(response); //iVBORw0KGgoAAAANSwCAIA...
-            res.status(200).send(response);
+            res.status(200).send('data:image/png;base64,' + response);
         }
     )
     .catch(
