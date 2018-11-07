@@ -31,13 +31,13 @@ router.post('/door', function(req, res) {
         body: JSON.stringify(req.body),
         json: true
     };
-
+    console.log(options);
     request(options, function (error, response, body) {
         if (error) {
             res.status(response.statusCode).send(response);
             throw new Error(error);
         }
-
+        console.log(err, response, body);
         res.status(response.statusCode).send(body);
     });
 });
