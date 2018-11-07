@@ -119,7 +119,7 @@ router.get('/:department', function(req, res) {
     ref = req.database.ref('/reservation');
     ref.once("value").then(function(snapshot) {
         let reservationObject = snapshot.val();
-        if(Object.prototype.hasOwnProperty.call(reservationObject, department)) {
+        if(reservationObject && Object.prototype.hasOwnProperty.call(reservationObject, department)) {
             res.status(200).send(reservationObject[department]);
         } else {
             res.status(404).send('找不到該院別資料');
