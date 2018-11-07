@@ -28,7 +28,7 @@ router.post('/door', function(req, res) {
         url: 'http://163.22.32.200:3000/door',
         headers:
         { 'Content-Type': 'application/json' },
-        body: req.body,
+        body: JSON.stringify(req.body),
         json: true
     };
 
