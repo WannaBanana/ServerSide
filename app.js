@@ -22,6 +22,7 @@ var alert = require('./routes/alert');
 var item = require('./routes/item');
 var permission = require('./routes/permission');
 var notify = require('./routes/notify');
+var reverseProxy = require('./routes/reverseProxy');
 
 var app = express();
 app.use(cors());
@@ -83,6 +84,7 @@ app.use('/api/alert', alert);
 app.use('/api/item', item);
 app.use('/api/permission', permission);
 app.use('/api/notify', notify);
+app.use('/reverseProxy',reverseProxy);
 
 var autoOpen = require('./module/autoOpen')(database);
 autoOpen.init();
