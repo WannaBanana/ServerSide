@@ -2,6 +2,24 @@ var express = require('express');
 var router = express.Router();
 var request = require('request');
 
+router.get('/snapshot', function(req, res) {
+    var options = {
+        method: 'GET',
+        url: 'http://163.22.32.200:3000/snapshot',
+        headers:
+        { 'Content-Type': 'application/json' },
+        body: req.body,
+        json: true
+    };
+    request(options, function (error, response, body) {
+        if (error) {
+            res.status(response.statusCode).send(response);
+            throw new Error(error);
+        }
+        res.status(response.statusCode).send(body);
+    });
+});
+
 router.get('/door', function(req, res) {
     var options = {
         method: 'GET',
