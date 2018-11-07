@@ -1,22 +1,22 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
+var image2base64 = require('image-to-base64');
 
 router.get('/snapshot', function(req, res) {
-    var options = {
-        method: 'GET',
-        url: 'http://163.22.32.200:3000/snapshot',
-        headers:
-        { 'Accept-Encoding': 'gzip, deflate' }
-    };
-    request(options, function (error, response, body) {
-        if (error) {
-            res.status(response.statusCode).send(response);
-            throw new Error(error);
+    image2base64("http://163.22.32.200:3000/snapshot")
+    .then(
+        (response) => {
+            console.log(response); //iVBORw0KGgoAAAANSwCAIA...
+            res.status(200).send(response);
         }
-        res.set('Content-Type', 'image/png;');
-        res.status(response.statusCode).send(body);
-    });
+    )
+    .catch(
+        (error) => {
+            console.log(error); //Exepection error....
+            res.status(500).send(error);
+        }
+    )
 });
 
 router.get('/door', function(req, res) {
