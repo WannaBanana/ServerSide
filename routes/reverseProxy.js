@@ -2,7 +2,9 @@ var express = require('express');
 var router = express.Router();
 var request = require('request');
 var fs = require("fs");
-var compress_images = require('compress-images')
+var imagemin = require('imagemin');
+var imageminPngquant = require('imagemin-pngquant');
+
 var image2base64 = require('image-to-base64');
 
 router.get('/snapshot', function(req, res) {
@@ -29,15 +31,7 @@ router.get('/originSnapshot', function(req, res) {
                     console.log(err);
                     return;
                 }
-                compress_images("/home/s104213083/ServerSide/out.png", "/home/s104213083/ServerSide/compress.png", {compress_force: false, statistic: true, autoupdate: true}, false,
-                    {jpg: {engine: 'mozjpeg', command: ['-quality', '60']}},
-                    {png: {engine: 'pngquant', command: ['--quality=20-50']}},
-                    {svg: {engine: 'svgo', command: '--multipass'}},
-                    {gif: {engine: 'gifsicle', command: ['--colors', '64', '--use-col=web']}}, function(error, completed, statistic){
-                    if(error) {
-                        console.log(error);
-                        return;
-                    }
+                imagemin(['./out.png'], 'build/images', {use: [imageminPngquant()]}).then(() => {
                     res.status(200).send({"message": "success"});
                 });
             });
