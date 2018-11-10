@@ -29,7 +29,7 @@ router.get('/originSnapshot', function(req, res) {
                     console.log(err);
                     return;
                 }
-                compress_images("./out.png", "./compress.png", {compress_force: false, statistic: true, autoupdate: true}, false,
+                compress_images("/home/s104213083/ServerSide/out.png", "/home/s104213083/ServerSide/compress.png", {compress_force: false, statistic: true, autoupdate: true}, false,
                     {jpg: {engine: 'mozjpeg', command: ['-quality', '60']}},
                     {png: {engine: 'pngquant', command: ['--quality=20-50']}},
                     {svg: {engine: 'svgo', command: '--multipass'}},
