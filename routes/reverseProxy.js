@@ -26,12 +26,12 @@ router.get('/originSnapshot', function(req, res) {
     image2base64("http://163.22.32.200:3000/snapshot")
     .then(
         (response) => {
-            fs.writeFile("./out.png", response, 'base64', function(err) {
+            fs.writeFile("./public/images/out.png", response, 'base64', function(err) {
                 if(err) {
                     console.log(err);
                     return;
                 }
-                imagemin(['./out.png'], 'build/images', {use: [imageminPngquant()]}).then(() => {
+                imagemin(['./public/images/out.png'], 'build/images', {use: [imageminPngquant()]}).then(() => {
                     res.status(200).send({"message": "success"});
                 });
             });
