@@ -632,6 +632,103 @@ router.put('/:department/:space', function(req, res) {
                                     ref.child(date).child(keys[index]).child('state').set("已核准").then(()=>{
                                         responseObject[keys[index]] = "已核准"
                                     }).then(()=>{
+                                        var options = {
+                                            method: 'POST',
+                                            url: 'https://xn--pss23c41retm.tw/api/linebot/user',
+                                            headers:
+                                            { 'Content-Type': 'application/json' },
+                                            body:
+                                            {
+                                                user: user,
+                                                message: {
+                                                    "type": "flex",
+                                                    "altText": "Flex Message",
+                                                    "contents": {
+                                                      "type": "bubble",
+                                                      "hero": {
+                                                        "type": "image",
+                                                        "url": "https://xn--pss23c41retm.tw/images/out.png",
+                                                        "size": "full",
+                                                        "aspectRatio": "20:13",
+                                                        "aspectMode": "cover",
+                                                        "action": {
+                                                          "type": "uri",
+                                                          "label": "WiSpace",
+                                                          "uri": "https://wannabanana.github.io"
+                                                        }
+                                                      },
+                                                      "body": {
+                                                        "type": "box",
+                                                        "layout": "vertical",
+                                                        "contents": [
+                                                          {
+                                                            "type": "text",
+                                                            "text": "預約審核通過",
+                                                            "size": "xl",
+                                                            "weight": "bold"
+                                                          },
+                                                          {
+                                                            "type": "box",
+                                                            "layout": "vertical",
+                                                            "spacing": "sm",
+                                                            "margin": "lg",
+                                                            "contents": [
+                                                              {
+                                                                "type": "box",
+                                                                "layout": "baseline",
+                                                                "spacing": "sm",
+                                                                "contents": [
+                                                                  {
+                                                                    "type": "text",
+                                                                    "text": "空間",
+                                                                    "flex": 1,
+                                                                    "size": "sm",
+                                                                    "color": "#AAAAAA"
+                                                                  },
+                                                                  {
+                                                                    "type": "text",
+                                                                    "text": department + " " + space,
+                                                                    "flex": 5,
+                                                                    "size": "sm",
+                                                                    "color": "#666666",
+                                                                    "wrap": true
+                                                                  }
+                                                                ]
+                                                              },
+                                                              {
+                                                                "type": "box",
+                                                                "layout": "baseline",
+                                                                "spacing": "sm",
+                                                                "contents": [
+                                                                  {
+                                                                    "type": "text",
+                                                                    "text": "時間",
+                                                                    "flex": 1,
+                                                                    "size": "sm",
+                                                                    "color": "#AAAAAA"
+                                                                  },
+                                                                  {
+                                                                    "type": "text",
+                                                                    "text": new Date(reservationObject[date][key].start).toLocaleDateString() + " " + new Date(reservationObject[date][key].start).toLocaleTimeString() + " - " + new Date(reservationObject[date][key].end).toLocaleTimeString(),
+                                                                    "flex": 5,
+                                                                    "size": "sm",
+                                                                    "color": "#666666",
+                                                                    "wrap": true
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    }
+                                                }
+                                            },
+                                            json: true
+                                        };
+                                        request(options, function (error, response, body) {
+                                            if (error) throw new Error(error);
+                                          });
                                         let date = new Date().toISOString().slice(0, 10);
                                         notify_ref = req.database.ref('/notify/' + user + '/' + date);
                                         notify_ref.push({
