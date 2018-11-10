@@ -14,6 +14,27 @@ const bot = linebot({
     channelAccessToken: config.line_accessToken
 });
 
+router.post('/user', function (req, res) {
+    database = req.database
+    let requestObject = req.body;
+    let user = requestObject.user;
+    let message = requestObject.message;
+    let ref = database.ref('/user/' + user);
+    ref.once("value").then(function(snapshot) {
+        let userObject = snapshot.val();
+        if(userObject) {
+            if(userObject.lineUserID.length <= 5) {
+                res.status(401).send({"message": "該使用者尚未綁定 line"});
+            } else {
+                bot.push(userObject.lineUserID, message);
+                res.status(200).send({"message": "success"});
+            }
+        } else {
+            res.status(404).send({"message": "找不到該使用者"});
+        }
+    });
+});
+
 router.post('/notify', function (req, res) {
     database = req.database
     let requestObject = req.body;
@@ -515,6 +536,25 @@ bot.on('postback', function (event) {
                     // console.log(depCode, space, method);
                     switch(method) {
                         case 'photo':
+                            var options = {
+                                method: 'GET',
+                                url: 'https://xn--pss23c41retm.tw/reverseProxy/originSnapshot'
+                            };
+                            request(options, function (error, response, body) {
+                                if (error) {
+                                    event.reply({
+                                        "type": "text",
+                                        "text": "照片讀取失敗，請稍後再試"
+                                    });
+                                    throw new Error(error);
+                                }
+                                event.reply({
+                                    "type": "image",
+                                    "originalContentUrl": "https://xn--pss23c41retm.tw/images/out.png",
+                                    "previewImageUrl": "https://xn--pss23c41retm.tw/images/out.png",
+                                    "animated": false
+                                });
+                            });
                             break;
                         case 'state':
                             ref = database.ref('/space/' + depCode + '/' + space);
