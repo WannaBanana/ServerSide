@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var request = require('request');
 
 /* 獲得各院空間預約資訊 */
 router.get('/book/:department/:space', function(req, res) {
