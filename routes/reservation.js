@@ -632,7 +632,6 @@ router.put('/:department/:space', function(req, res) {
                                 promises.push(new Promise((resolve, reject) => {
                                     ref.child(date).child(keys[index]).child('state').set("已核准").then(()=>{
                                         responseObject[keys[index]] = "已核准"
-                                    }).then(()=>{
                                         var options = {
                                             method: 'POST',
                                             url: 'https://xn--pss23c41retm.tw/api/linebot/user',
@@ -730,6 +729,7 @@ router.put('/:department/:space', function(req, res) {
                                         request(options, function (error, response, body) {
                                             if (error) throw new Error(error);
                                         });
+                                    }).then(()=>{
                                         let date = new Date().toISOString().slice(0, 10);
                                         notify_ref = req.database.ref('/notify/' + user + '/' + date);
                                         notify_ref.push({
