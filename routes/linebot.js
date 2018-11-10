@@ -582,7 +582,7 @@ bot.on('postback', function (event) {
                                             },
                                             "hero": {
                                             "type": "image",
-                                            "url": "https://d2r72yk5wmppdj.cloudfront.net/m/3ced976c1b910852/Low-Classroom_Traditional_Introduction-Banner.jpg",
+                                            "url": "https://xn--pss23c41retm.tw/images/out.png",
                                             "size": "full",
                                             "aspectRatio": "20:13",
                                             "aspectMode": "cover"
