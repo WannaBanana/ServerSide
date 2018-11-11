@@ -5,19 +5,21 @@ const secret = require('../secret.json');
 
 /* 取得驗證及非驗證使用者資料 */
 router.get('/verify', function(req, res) {
-    ref = req.database.ref('/user');
+    let ref = req.database.ref('/user');
     let responseData = {};
     ref.orderByChild('state').equalTo('已驗證').on("value", function(verify_snapshot) {
         let userObject = verify_snapshot.val();
         if(userObject) {
             responseData['已驗證'] = userObject;
         }
+    }).then(()=>{
         ref.orderByChild('state').equalTo('未驗證').on("value", function(unverify_snapshot) {
             userObject = unverify_snapshot.val();
             if(userObject) {
                 responseData['未驗證'] = userObject;
             }
             res.status(200).send(responseData);
+            return;
         });
     });
 });
