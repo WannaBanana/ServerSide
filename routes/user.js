@@ -7,19 +7,22 @@ const secret = require('../secret.json');
 router.get('/verify', function(req, res) {
     let ref = req.database.ref('/user');
     let responseData = {};
-    ref.orderByChild('state').equalTo('已驗證').on("value", function(verify_snapshot) {
-        let userObject = verify_snapshot.val();
+    ref.once('value').then(function(snapshot) {
+        let userObject = snapshot.val();
         if(userObject) {
-            responseData['已驗證'] = userObject;
-        }
-        ref.orderByChild('state').equalTo('未驗證').on("value", function(unverify_snapshot) {
-            userObject = unverify_snapshot.val();
-            if(userObject) {
-                responseData['未驗證'] = userObject;
+            responseData['已驗證'] = {};
+            responseData['未驗證'] = {};
+            for(let user in userObject) {
+                if(userObject[user].state == '已驗證') {
+                    responseData['已驗證'][user] = userObject[user];
+                } else {
+                    responseData['未驗證'][user] = userObject[user];
+                }
             }
             res.status(200).send(responseData);
-            return;
-        });
+        } else {
+            res.status(404).send({"message": "找不到使用者資料"});
+        }
     });
 });
 
