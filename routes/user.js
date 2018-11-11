@@ -10,12 +10,16 @@ router.get('/verify', function(req, res) {
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
         if(userObject) {
-            responseData['已驗證'] = {};
-            responseData['未驗證'] = {};
             for(let user in userObject) {
                 if(userObject[user].state == '已驗證') {
+                    if(!responseData['已驗證']) {
+                        responseData['已驗證'] = {};
+                    }
                     responseData['已驗證'][user] = userObject[user];
                 } else {
+                    if(!responseData['未驗證']) {
+                        responseData['未驗證'] = {};
+                    }
                     responseData['未驗證'][user] = userObject[user];
                 }
             }
