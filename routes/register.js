@@ -159,23 +159,17 @@ router.patch('/:sid', function(req, res) {
 });
 
 /* 驗證帳號 */
-router.post('/verify/:sid', function(req, res) {
+router.patch('/verify/:sid', function(req, res) {
     let sid = req.params.sid;
-    let ref = req.database.ref('/user');
+    let ref = req.database.ref('/user/' + sid);
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
-        if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
-            let sdutend_ref = req.database.ref('/user/' + sid);
-            sdutend_ref.once('value').then(function(student_snapshot) {
-                let studentObject = student_snapshot.val();
-                studentObject.state = '已驗證';
-                sdutend_ref.update(studentObject);
+        if(userObject) {
+            ref.child('state').set('已驗證').then(() => {
                 res.status(200).send({"message": "驗證成功"});
-                return;
             });
         } else {
             res.status(404).send({"message": "找不到該使用者"});
-            return;
         }
     });
 });
