@@ -171,7 +171,7 @@ router.patch('/verify/:sid', function(req, res) {
                 studentObject.state = '已驗證';
                 ref.update(studentObject).then(()=>{
                     let date = new Date().toISOString().slice(0, 10);
-                    let notify_ref = req.database.ref('/notify/' + user + '/' + date);
+                    let notify_ref = req.database.ref('/notify/' + sid + '/' + date);
                     notify_ref.push({
                         "type": "帳號審核",
                         "state": "通過審核"
