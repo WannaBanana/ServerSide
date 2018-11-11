@@ -159,7 +159,7 @@ router.patch('/:sid', function(req, res) {
 });
 
 /* 驗證帳號 */
-router.patch('/verify/:sid', function(req, res) {
+router.post('/verify/:sid', function(req, res) {
     let sid = req.params.sid;
     let ref = req.database.ref('/user');
     ref.once('value').then(function(snapshot) {
@@ -170,10 +170,14 @@ router.patch('/verify/:sid', function(req, res) {
                 let studentObject = student_snapshot.val();
                 studentObject.state = '已驗證';
                 ref.update(studentObject);
+                res.status(200).send({"message": "驗證成功"});
+                return;
             });
+        } else {
+            res.status(404).send({"message": "找不到該使用者"});
+            return;
         }
     });
-    res.status(200).send({"message": "驗證成功"});
 });
 
 /* 刪除卡片 */
