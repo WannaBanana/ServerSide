@@ -165,11 +165,11 @@ router.post('/verify/:sid', function(req, res) {
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
         if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
-            ref = req.database.ref('/user/' + sid);
-            ref.once('value').then(function(student_snapshot) {
+            let sdutend_ref = req.database.ref('/user/' + sid);
+            sdutend_ref.once('value').then(function(student_snapshot) {
                 let studentObject = student_snapshot.val();
                 studentObject.state = '已驗證';
-                ref.update(studentObject);
+                sdutend_ref.update(studentObject);
                 res.status(200).send({"message": "驗證成功"});
                 return;
             });
