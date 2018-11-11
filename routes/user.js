@@ -12,7 +12,6 @@ router.get('/verify', function(req, res) {
         if(userObject) {
             responseData['已驗證'] = userObject;
         }
-    }).then(()=>{
         ref.orderByChild('state').equalTo('未驗證').on("value", function(unverify_snapshot) {
             userObject = unverify_snapshot.val();
             if(userObject) {
