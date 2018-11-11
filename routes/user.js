@@ -18,6 +18,7 @@ router.get('/verify', function(req, res) {
                 responseData['未驗證'] = userObject;
             }
             res.status(200).send(responseData);
+            return;
         });
     });
 });
