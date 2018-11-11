@@ -161,7 +161,7 @@ router.patch('/:sid', function(req, res) {
 /* 驗證帳號 */
 router.patch('/verify/:sid', function(req, res) {
     let sid = req.params.sid;
-    ref = req.database.ref('/user');
+    let ref = req.database.ref('/user');
     ref.once('value').then(function(snapshot) {
         let userObject = snapshot.val();
         if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
@@ -177,6 +177,7 @@ router.patch('/verify/:sid', function(req, res) {
                     "state": "通過審核"
                 });
                 res.status(200).send({"message": "驗證成功"});
+                return;
             });
         } else {
             res.status(404).send({"message": "找不到該使用者"});
