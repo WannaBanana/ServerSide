@@ -582,7 +582,7 @@ bot.on('postback', function (event) {
                                             },
                                             "hero": {
                                             "type": "image",
-                                            "url": "https://xn--pss23c41retm.tw/images/out.png",
+                                            "url": "https://s18798.pcdn.co/ls-thinkglobalteachlocal/wp-content/uploads/sites/2415/2017/11/Squillace-Nativism-Normalization.jpeg",
                                             "size": "full",
                                             "aspectRatio": "20:13",
                                             "aspectMode": "cover"
