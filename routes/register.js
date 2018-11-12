@@ -167,7 +167,7 @@ router.patch('/verify/:sid', function(req, res) {
         if(userObject) {
             ref.child('state').set('已驗證').then(() => {
                 let permission_ref = req.database.ref('/permission/' + sid);
-                permission_ref.push({
+                permission_ref.set({
                     "admin": "false"
                 });
                 res.status(200).send({"message": "驗證成功"});
