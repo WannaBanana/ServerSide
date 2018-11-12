@@ -217,18 +217,33 @@ router.delete('/:sid/card/:cardID', function(req, res) {
 /* 刪除帳號 */
 router.delete('/:sid', function(req, res) {
     let sid = req.params.sid;
-    let requestObject = JSON.parse(JSON.stringify(req.body));
+    let requestObject = req.body;
     ref = req.database.ref('/user');
     ref.once("value").then(function(snapshot) {
         let userObject = snapshot.val();
         if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
-            if(userObject[sid].password == crypto.createHmac('sha256', secret.salt).update(requestObject.newpassword).digest('hex')) {
+            if(userObject[sid].password == crypto.createHmac('sha256', secret.salt).update(requestObject.password).digest('hex')) {
                 delete userObject[sid];
                 ref.set(userObject);
                 res.status(200).send({"message": "刪除成功"});
             } else {
                 res.status(401).send({"message": "密碼驗證錯誤"});
             }
+        } else {
+            res.status(404).send({"message": "找不到該學號"});
+        }
+    });
+});
+
+router.delete('/admin/:sid', function(req, res) {
+    let sid = req.params.sid;
+    ref = req.database.ref('/user');
+    ref.once("value").then(function(snapshot) {
+        let userObject = snapshot.val();
+        if(userObject && Object.prototype.hasOwnProperty.call(userObject, sid)) {
+            delete userObject[sid];
+            ref.set(userObject);
+            res.status(200).send({"message": "刪除成功"});
         } else {
             res.status(404).send({"message": "找不到該學號"});
         }
